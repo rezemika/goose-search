@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+    <h1>Goose <small>Offers an Openstreetmap Search Engine</small></h1>
+    <br/>
+    <div class="alert alert-info" role="complementary">Goose est un outil de recherche géographique. Vous pouvez entrer vos coordonnées GPS avec le bouton "Me localiser" ou entrer une adresse. Choisissez le sujet de votre recherche, le rayon (en mètres) et cliquez sur "Envoyer". La requête peut prendre un certain temps.</div>
+    <br/>
+    <form method="post" action="" id="geoform">
+        <div role="search">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="button" id="localisation-btn" value="Me localiser" onclick="getLocationConstant()" class="btn btn-secondary btn-mobile btn-sharp"/>
+            <input type="submit" id="submit-btn" value="Envoyer" class="btn btn-primary btn-mobile btn-sharp"/>
+        </div>
+    </form>
+    <br/>
+    <script type="text/javascript" src="{% static 'js/geolocation_form.js' %}"></script>
+{% endblock %}
