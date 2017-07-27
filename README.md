@@ -3,7 +3,9 @@ Goose - Un moteur de recherche géographique utilisant OpenStreetMap
 
 **Goose** (acronyme récursif pour *Goose Offers an Openstreetmap Search Engine*) est un moteur de recherche géographique utilisant les données d'OpenStreetMap pour retourner une liste de points d'intérêt à proximité. Il est disponnible à l'adresse [goose-sear.ch](https://goose-sear.ch/).
 
-**Version de production actuelle : 0.1.0**
+**Version de production actuelle : 0.1.1**
+
+This repository uses [the cactus model](https://barro.github.io/2016/02/a-succesful-git-branching-model-considered-harmful/). The development happens in the 'master' branch, the production versions are merged to the 'prod' branch.
 
 # Fonctionnalités
 
