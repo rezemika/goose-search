@@ -20,7 +20,7 @@ from search import views as search_views
 urlpatterns = [
     url(r'^$', search_views.home, name='home'),
     url(r'^results/$', search_views.results, name='results'),
-    url(r'^results/getresults/$', search_views.get_results, name='getresults'),
+    url(r'^getresults/$', search_views.get_results, name='getresults'),
     url(r'^about/$', search_views.about, name='about'),
     url(r'^admin/', admin.site.urls)
 ]
