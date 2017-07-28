@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseServerError, HttpResponseForbidden
 from search.forms import SearchForm
+from django import forms
 from search.models import SearchPreset
 from search.templatetags import geo_extras
 from goose import settings
@@ -114,15 +115,12 @@ def home(request):
             form.clean()
             user_latitude = form.cleaned_data["user_latitude"]
             user_longitude = form.cleaned_data["user_longitude"]
-            if not user_latitude or not user_longitude:
-                user_latitude = user_longitude = None
-            else:
-                user_latitude = float(user_latitude)
-                user_longitude = float(user_longitude)
+            calculated_address = form.cleaned_data["calculated_address"]
             request.session["search_form"] = {
                 "user_latitude": user_latitude,
                 "user_longitude": user_longitude,
-                "user_address": form.cleaned_data["user_address"],
+                "user_address": calculated_address,
+                "calculated_address": calculated_address,
                 "radius": form.cleaned_data["radius"],
                 "searched_target_id": form.cleaned_data["searched_target"].id,
                 "no_private": form.cleaned_data["no_private"],
@@ -143,36 +141,9 @@ def results(request):
         searched_target_id = request.session["search_form"]["searched_target_id"]
         user_latitude = request.session["search_form"]["user_latitude"]
         user_longitude = request.session["search_form"]["user_longitude"]
-        user_address = request.session["search_form"]["user_address"]
+        user_estimated_address = request.session["search_form"]["calculated_address"]
         radius = request.session["search_form"]["radius"]
         no_private = request.session["search_form"]["no_private"]
-        if not user_latitude or not user_longitude:
-            if user_address:
-                attempts = 0
-                while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
-                    try:
-                        user_pos = geolocator.geocode(user_address, language="fr")
-                        break
-                    except geopy.exc.GeopyError as e:
-                        attempts += 1
-                        if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
-                            raise e
-                user_latitude = user_pos.latitude
-                user_longitude = user_pos.longitude
-                user_estimated_address = user_pos.address
-        else:
-            user_latitude = float(user_latitude)
-            user_longitude = float(user_longitude)
-            attempts = 0
-            while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
-                try:
-                    user_pos = geolocator.reverse((user_latitude, user_longitude), language="fr")
-                    break
-                except geopy.exc.GeopyError as e:
-                    attempts += 1
-                    if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
-                        raise e
-            user_estimated_address = user_pos.address
     else:
         return redirect("home")
     return render(request, "search/geo_results.html", {

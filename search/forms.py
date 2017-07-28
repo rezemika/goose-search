@@ -1,5 +1,9 @@
 from django import forms
 from search.models import SearchPreset
+import geopy
+from goose import settings
+
+geolocator = geopy.geocoders.Nominatim(timeout=2000)
 
 class SearchForm(forms.Form):
     """
@@ -43,3 +47,32 @@ class SearchForm(forms.Form):
                 raise forms.ValidationError("Vous devez renseigner"
                     " vos coordonnées GPS ou votre adresse actuelle.",
                     code='invalid')
+        attempts = 0
+        while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
+            try:
+                if user_address:
+                    calculated_position = geolocator.geocode(
+                        user_address, language="fr"
+                    )
+                else:
+                    coords = (float(user_latitude), float(user_longitude))
+                    calculated_position = geolocator.reverse(
+                        coords, language="fr"
+                    )
+                break
+            except geopy.exc.GeopyError as e:
+                attempts += 1
+                if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
+                    raise e
+        if calculated_position is None:
+            raise forms.ValidationError(
+                "L'adresse renseignée n'a pas permis de vous "
+                "localiser. Vous pouvez essayer de la "
+                "préciser, par exemple avec un code postal."
+            )
+        else:
+            calculated_address = calculated_position.address
+            cleaned_data["user_latitude"] = calculated_position.latitude
+            cleaned_data["user_longitude"] = calculated_position.longitude
+        cleaned_data["calculated_address"] = calculated_address
+        return cleaned_data
