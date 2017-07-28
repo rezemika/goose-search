@@ -43,12 +43,26 @@ function request_results (radius, userLatitude, userLongitude, searchedTargetId,
         console.log('Success, but no results !')
         return
       }
+      console.log('ABCD GGGGGGGGGGGGGGG');
       // Allowings linebreaks.
       const htmlOutput = json.content.map(part => '\n\n' + part.replace(/\r?\n/g, '<br>\n')).join('')
+      // Fills the page.
       $('#geo_results').html('<ul id="results_list">' + htmlOutput + '</ul>')
+      // Updates the ARIA.
       $('#geo_results').attr("aria-live", "assertive");
       $('#geo_results').attr("aria-busy", "false");
+      // Makes popovers open on top on small screens.
+      if ($(document).width() < 768) {
+        console.log("Small screen detected, popovers will open on top.");
+        var popovers = document.querySelectorAll('[data-toggle="popover"]')
+        console.log(popovers);
+        for (i=0; i < popovers.length; i++) {
+            popovers[i].setAttribute("data-placement", "top");
+        }
+      }
+      // Enables popovers.
       $('[data-toggle="popover"]').popover();
+      // Loads filters.
       $('#results_filters').html(json.filters);
       console.log(json.filters);
       console.log('Success !')
