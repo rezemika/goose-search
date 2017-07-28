@@ -45,7 +45,7 @@ function request_results (radius, userLatitude, userLongitude, searchedTargetId,
       }
       // Allowings linebreaks.
       const htmlOutput = json.content.map(part => '\n\n' + part.replace(/\r?\n/g, '<br>\n')).join('')
-      $('#geo_results').html('<ul style="list-style:none" id="results_list">' + htmlOutput + '</ul>')
+      $('#geo_results').html('<ul id="results_list">' + htmlOutput + '</ul>')
       $('#geo_results').attr("aria-live", "assertive");
       $('#geo_results').attr("aria-busy", "false");
       $('[data-toggle="popover"]').popover();
