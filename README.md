@@ -20,7 +20,6 @@ Ce dépôt utilise [le "cactus model"](https://barro.github.io/2016/02/a-succesf
 - Recherche avancée avec tags personnalisés
 - Tests unitaires
 - Aligner le logo de Github et la version actuelle dans le menu replié
-- Meilleure gestion des erreurs
 
 # Licence
 
