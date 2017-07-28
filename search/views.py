@@ -148,14 +148,14 @@ def results(request):
         no_private = request.session["search_form"]["no_private"]
         if not user_latitude or not user_longitude:
             if user_address:
-                attemps = 0
-                while attemps < settings.GOOSE_META["max_geolocation_attempts"]:
+                attempts = 0
+                while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
                     try:
                         user_pos = geolocator.geocode(user_address, language="fr")
                         break
                     except geopy.exc.GeopyError as e:
-                        attemps += 1
-                        if attemps == settings.GOOSE_META["max_geolocation_attempts"]:
+                        attempts += 1
+                        if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
                             raise e
                 user_latitude = user_pos.latitude
                 user_longitude = user_pos.longitude
@@ -163,14 +163,14 @@ def results(request):
         else:
             user_latitude = float(user_latitude)
             user_longitude = float(user_longitude)
-            attemps = 0
-            while attemps < settings.GOOSE_META["max_geolocation_attempts"]:
+            attempts = 0
+            while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
                 try:
                     user_pos = geolocator.reverse((user_latitude, user_longitude), language="fr")
                     break
                 except geopy.exc.GeopyError as e:
-                    attemps += 1
-                    if attemps == settings.GOOSE_META["max_geolocation_attempts"]:
+                    attempts += 1
+                    if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
                         raise e
             user_estimated_address = user_pos.address
     else:
