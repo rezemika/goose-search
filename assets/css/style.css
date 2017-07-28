@@ -5,7 +5,9 @@ html, body {
     overflow-x: hidden;
 }
 
-body {
+#content {
+    margin-left: 75px;
+    margin-right: 75px;
     margin-bottom: 30px;
 }
 
@@ -19,6 +21,11 @@ body {
 }
 
 @media (max-width: 767px) {
+    #content {
+        margin-left: 2px;
+        margin-right: 2px;
+    }
+    
     .geo_search_result_box {
         width: 99%;
     }
