@@ -5,7 +5,7 @@ Goose - Un moteur de recherche géographique utilisant OpenStreetMap
 
 **Version de production actuelle : 0.1.1**
 
-This repository uses [the cactus model](https://barro.github.io/2016/02/a-succesful-git-branching-model-considered-harmful/). The development happens in the 'master' branch, the production versions are merged to the 'prod' branch.
+Ce dépôt utilise [le "cactus model"](https://barro.github.io/2016/02/a-succesful-git-branching-model-considered-harmful/). Le développement se fait dans la branche 'master', les versions de production sont mergées dans la branche 'prod'.
 
 # Fonctionnalités
 
