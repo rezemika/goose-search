@@ -20,7 +20,8 @@ Ce dépôt utilise [le "cactus model"](https://barro.github.io/2016/02/a-succesf
 - Recherche avancée avec tags personnalisés
 - Tests unitaires
 - Aligner le logo de Github et la version actuelle dans le menu replié
-- Utiliser la version 0.2.0 du module [humanized_opening_hours](https://github.com/rezemika/humanized_opening_hours).
+- Utiliser la version 0.2.0 du module [humanized_opening_hours](https://github.com/rezemika/humanized_opening_hours)
+- Corriger l'affichage du bloc "Filtrer les résultats" qui n'est plus stylisé
 
 # Licence
 
