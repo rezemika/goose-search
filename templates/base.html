@@ -7,7 +7,6 @@
         <meta name="generator" content="Geany 1.27"/>
         <meta name="description" content={{ GOOSE_META.description }}/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <meta http-equiv="Content-Security-Policy" content="default-src 'self'; referrer no-referrer; reflected-xss block"/>
         {% load static %}
         <!-- Favicon and logo from https://www.freefavicon.com/freefavicons/animal/iconinfo/goose----152-248178.html -->
         <link rel="icon" type="image/png" href="{% static 'images/favicon.ico' %}" />
@@ -40,10 +39,11 @@
                         <li><a href="/about">À propos</a></li>
                     </ul>
                     <div class="navbar-right">
-                        <p class="navbar-text" class="version">Version {{ GOOSE_META.version }}</p>
-                        <a class="navbar-brand" href="https://github.com/rezemika/goose-search">
-                            <img alt="Goose" class="github-logo" src="{% static 'images/GitHub-Mark-32px.png' %}"/>
-                        </a>
+                        <p class="navbar-text navbar-right" class="version">Version {{ GOOSE_META.version }}
+                            <a class="navbar-brand" href="https://github.com/rezemika/goose-search">
+                                <img alt="Goose" class="github-logo" src="{% static 'images/GitHub-Mark-32px.png' %}"/>
+                            </a>
+                        </p>
                     </div>
                 </div>
             </div>
