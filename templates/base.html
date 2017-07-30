@@ -35,8 +35,9 @@
                 
                 <div class="collapse navbar-collapse" id="navbar-1">
                     <ul class="nav navbar-nav">
-                        <li><a href="/">Recherche</a></li>
-                        <li><a href="/about">À propos</a></li>
+                        <li><a href="{% url 'home' %}">Recherche</a></li>
+                        <li><a href="{% url 'about' %}">À propos</a></li>
+                        {% if user.is_authenticated %}<li><a href="/admin">Administration</a></li>{% endif %}
                     </ul>
                     <div class="navbar-right">
                         <p class="navbar-text navbar-right" class="version">Version {{ GOOSE_META.version }}

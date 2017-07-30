@@ -16,7 +16,7 @@
         <br/>
         <p>Les résultats sont triés par ordre croissant de distance par rapport à votre position. Les liens de guidage sont prévus pour des piétons.</p>
     </div>
-    <form action="/geo"><input type="submit" value="Nouvelle recherche" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
+    <form action="{% url 'home' %}"><input type="submit" value="Nouvelle recherche" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
     <br/>
     <form id="results_filters">
     </form>
