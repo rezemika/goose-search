@@ -28,7 +28,7 @@ class SearchForm(forms.Form):
         min_value=100, max_value=2000, initial=500,
         widget=forms.NumberInput(attrs=
             {"class": "form-control", "step": 50}))
-    searched_target = forms.ModelChoiceField(label="Votre recherche",
+    search_preset = forms.ModelChoiceField(label="Votre recherche",
         queryset=SearchPreset.objects.all(),
         widget=forms.Select(attrs={"class": "form-control"}))
     no_private = forms.BooleanField(required=False, initial=True,

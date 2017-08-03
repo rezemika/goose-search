@@ -9,10 +9,10 @@
         <ul>
             <li>Latitude : {{ user_coords.0|render_coordinate }}</li>
             <li>Longitude : {{ user_coords.1|render_coordinate }}</li>
-            <li>Adresse : {{ user_estimated_address }}</li>
+            <li>Adresse : {{ user_address }}</li>
         </ul>
         <br/>
-        <p>Recherche : {% render_searched_target searched_target_id radius no_private %}</p>
+        <p>Recherche : {{ search_description }}</p>
         <br/>
         <p>Les résultats sont triés par ordre croissant de distance par rapport à votre position. Les liens de guidage sont prévus pour des piétons.</p>
     </div>
@@ -47,11 +47,11 @@
         var userLatitude = {{ user_coords.0|render_coordinate }};
         var userLongitude = {{ user_coords.1|render_coordinate }};
         var radius = {{ radius }};
-        var searchedTargetId = {{ searched_target_id }};
+        var searchPresetId = {{ search_preset_id }};
         var no_private = {{ no_private|render_bool_js }};
         var was_limited = {{ was_limited|render_bool_js }};
         $(document).ready(function() {
-            request_results(radius, userLatitude, userLongitude, searchedTargetId, no_private, was_limited);
+            request_results(radius, userLatitude, userLongitude, searchPresetId, no_private, was_limited);
         });
     </script>
     

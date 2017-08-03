@@ -11,7 +11,7 @@ html, body {
     margin-bottom: 30px;
 }
 
-.geo_search_result_box {
+.result-box {
     margin-bottom: 1em;
     border: solid 1px;
     border-color: grey;
@@ -26,7 +26,7 @@ html, body {
         margin-right: 2px;
     }
     
-    .geo_search_result_box {
+    .result-box {
         width: 99%;
     }
     

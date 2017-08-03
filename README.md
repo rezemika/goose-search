@@ -16,6 +16,7 @@ Ce dépôt utilise [le "cactus model"](https://barro.github.io/2016/02/a-succesf
 
 # TODO
 
+- **Prioritaire** : Restaurer les tags, qui ne sont plus supportés depuis la refactorisation.
 - Version statique ne requérant pas JavaScript
 - Recherche avancée avec tags personnalisés
 - Tests unitaires
