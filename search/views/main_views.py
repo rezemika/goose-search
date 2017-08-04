@@ -89,13 +89,15 @@ def get_results(request):
     status = "error"
     err_msg = ""
     debug_msg = ""
-    present_tags = {}
+    tags_filter = ""
     try:
         results = utils.get_results(
             search_preset, (user_latitude, user_longitude), radius,
-            no_private, present_tags
+            no_private
         )
         for result in results:
+            tags_count = utils.get_all_tags(results)
+            tags_filter = utils.render_tag_filter(tags_count, len(results))
             rendered_results.append("<li>" + result.render() + "</li>")
         status = "ok"
     except geopy.exc.GeopyError as e:
@@ -107,7 +109,6 @@ def get_results(request):
     except Exception as e:
         err_msg = "Une erreur non prise en charge s'est produite."
         debug_msg = str(e)
-        raise e
     # Logs the request to make statistics.
     # Doesn't logs if the request comes from an authenticated user,
     # as it is probably an admin.
@@ -122,11 +123,9 @@ def get_results(request):
                 lon=round(user_longitude)
             )
         )
-    # TODO
-    filters = "<em>Les filtres ne sont plus disponnibles pour l'instant, désolé.</em>"
     return HttpResponse(json.dumps({
             "status": status, "content": rendered_results, "err_msg": err_msg,
-            "debug_msg": debug_msg, "filters": filters
+            "debug_msg": debug_msg, "filters": tags_filter
         }),
         content_type="application/json"
     )

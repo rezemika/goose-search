@@ -5,6 +5,7 @@ import humanized_opening_hours
 from math import sin, cos, atan2, degrees
 from goose import settings
 import overpass
+from collections import OrderedDict
 
 geolocator = geopy.geocoders.Nominatim(timeout=2000)
 
@@ -55,7 +56,7 @@ def deg2dir(deg):
     ix = int((deg + 22.5)/45)
     return dirs[ix % 8]
 
-def get_results(search_preset, user_coords, radius, no_private, present_tags):
+def get_results(search_preset, user_coords, radius, no_private):
     """
         Returns a list of dicts with the properties of all results.
     """
@@ -78,6 +79,74 @@ def get_results(search_preset, user_coords, radius, no_private, present_tags):
         results.append(Result(element, search_preset, user_coords))
     results = sorted(results, key=lambda result: result.distance)
     return results
+
+def render_tag_filter(tags, count):
+    """
+        Returns a raw HTML form allowing to filter results (uses JS)
+        from a dict of tags and the total number of results.
+    """
+    html = """\
+    <div class="panel panel-default">
+        <div class="panel-heading" role="tab" id="headingTwo">
+            <h4 class="panel-title">
+                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        <center>Filtrer les résultats <span class="badge">{count}</span></center>
+                </a>
+            </h4>
+        </div>
+        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+            <div class="panel-body">
+                {content}
+            </div>
+        </div>
+    </div>
+    """
+    output = ""
+    # TODO : Make it cleaner.
+    tag_names = OrderedDict()
+    tag_names["open"] = "Ouvert"
+    tag_names["closed"] = "Fermé"
+    tag_names["unknown_schedules"] = "Horaires inconnues"
+    tag_names["vegetarian:yes"] = "Menu végétarien"
+    tag_names["vegetarian:only"] = "Entièrement végétarien"
+    tag_names["vegetarian:no"] = "Non végétarien"
+    tag_names["vegetarian:unknown"] = "Statut végétarien inconnu"
+    tag_names["vegan:yes"] = "Menu végétalien"
+    tag_names["vegan:only"] = "Entièrement végétalien"
+    tag_names["vegan:no"] = "Non végétalien"
+    tag_names["vegan:unknown"] = "Statut végétalien inconnu"
+    tag_names["wheelchair:yes"] = "Accessible aux fauteuils roulants"
+    tag_names["wheelchair:limited"] = "Accès limité aux fauteuils roulants"
+    tag_names["wheelchair:no"] = "Non accessible aux fauteuils roulants"
+    tag_names["wheelchair:unknown"] = "Statut des fauteuils roulants inconnu"
+    for tag in tag_names:
+        if tag in tags:
+            n = tags[tag]
+            output += (
+                '<input type="checkbox" checked '
+                'onchange="filter_results_handler(this)" '
+                'name="result_filter" id="filter_{tag}" value="{tag}">'
+                '<label for="filter_{tag}"> {label} <span class="badge">'
+                '{count}</span></label><br/>\n'
+            ).format(
+                tag=tag, label=tag_names[tag], count=tags[tag]
+            )
+    return html.format(count=count, content=output)
+
+def get_all_tags(results):
+    """
+        Returns a dict of all tags and their occurences from a list
+        of results.
+    """
+    tags_count = {}
+    for result in results:
+        result_tags = result.get_tags()
+        for tag in result_tags:
+            if tag in tags_count.keys():
+                tags_count[tag] += 1
+            else:
+                tags_count[tag] = 1
+    return tags_count
 
 class Result:
     """
@@ -112,10 +181,58 @@ class Result:
             self.opening_hours = humanized_opening_hours.HumanizedOpeningHours(
                 oh_field, "fr", tz=pytz.timezone("Europe/Paris")
             )
-        # TODO : Tags.
+        self.tags = []
         return
     
-    def render(self, link_to_osm=True, opening_hours=True, itinerary=True):
+    def get_tags(self):
+        """
+            Returns a list of all tags present in the result.
+        """
+        tags = []
+        # Opening hours.
+        if self.opening_hours is not None:
+            if self.opening_hours.is_open():
+                tags.append("open")
+            else:
+                tags.append("closed")
+        else:
+            tags.append("unknown_schedules")
+        # Diet.
+        diet = self.properties.get("diet:vegetarian")
+        if diet:
+            if diet == "yes":
+                tags.append("vegetarian:yes")
+            elif diet == "only":
+                tags.append("vegetarian:only")
+            else:
+                tags.append("vegetarian:no")
+        else:
+            tags.append("vegetarian:unknown")
+        diet = self.properties.get("diet:vegan")
+        if diet:
+            if diet == "yes":
+                tags.append("vegan:yes")
+            elif diet == "only":
+                tags.append("vegan:only")
+            else:
+                tags.append("vegetarian:no")
+        else:
+            tags.append("vegan:unknown")
+        # Wheelchairs.
+        wc = self.properties.get("wheelchair")
+        if wc:
+            if wc == "yes":
+                tags.append("wheelchair:yes")
+            elif wc == "limited":
+                tags.append("wheelchair:limited")
+            elif wc == "no":
+                tags.append("wheelchair:no")
+        else:
+            tags.append("wheelchair:unknown")
+        self.tags = tags
+        return tags
+    
+    def render(self, render_tags=True, link_to_osm=True, opening_hours=True, itinerary=True):
         """
             Returns an HTML div (with "result-box" class) displaying
             a result and its properties.
@@ -178,6 +295,15 @@ class Result:
                 '<a href="{}"><img class="osm-link-logo" '
                 'src="/static/images/osm_logo.png"></a>'
             ).format(osm_link) + content
+        
+        if render_tags:
+            tags_list = ';'.join(self.tags)
+            result_tags = (
+                '<span class="result_tags" style="visibility:hidden">{tags}</span>'
+            ).format(
+                tags=tags_list
+            )
+            content += result_tags
         
         return html.format(content)
     
