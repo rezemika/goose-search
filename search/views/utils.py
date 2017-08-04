@@ -178,9 +178,13 @@ class Result:
         oh_field = self.properties.get("opening_hours")
         self.opening_hours = None
         if oh_field:
-            self.opening_hours = humanized_opening_hours.HumanizedOpeningHours(
-                oh_field, "fr", tz=pytz.timezone("Europe/Paris")
-            )
+            try:
+                self.opening_hours = humanized_opening_hours.HumanizedOpeningHours(
+                    oh_field, "fr", tz=pytz.timezone("Europe/Paris")
+                )
+            except humanized_opening_hours.HOHError:
+                # TODO : Log and warn user.
+                self.opening_hours = None
         self.tags = []
         return
     
