@@ -72,7 +72,15 @@ def get_results(search_preset, user_coords, radius, no_private):
             osm_key=line, r=radius,
             lat=user_coords[0], lon=user_coords[1]
         )
-        response += api.Get(request)['features']
+        attempts = 0
+        while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
+            try:
+                response += api.Get(request)['features']
+                break
+            except overpass.OverpassError as e:
+                attempts += 1
+                if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
+                    raise e
     for element in response:
         if no_private and element["properties"].get("access") in ["private", "no"]:
             continue
