@@ -29,9 +29,11 @@ class Command(BaseCommand):
         return
     
     def random_char(self):
+        # TODO : Use str.translate()
         return random.choice(string.printable[:-6].replace("'", '').replace('"', ''))
     
     def new_secret_key(self):
+        # TODO : Use random.sample()
         output = ''
         while len(output) != 50:
             output += self.random_char()
