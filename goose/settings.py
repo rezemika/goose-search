@@ -193,6 +193,11 @@ LOGGING = {
             'handlers': ['statistics_handler'],
             'level': 'INFO',
             'propagate': True,
+        },
+        'DEBUG': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
         }
     }
 }
