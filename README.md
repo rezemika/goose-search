@@ -19,7 +19,6 @@ Ce dépôt utilise [le "cactus model"](https://barro.github.io/2016/02/a-succesf
 - Version statique ne requérant pas JavaScript
 - Recherche avancée avec tags personnalisés
 - Tests unitaires
-- Utiliser la version 0.2.0 du module [humanized_opening_hours](https://github.com/rezemika/humanized_opening_hours)
 
 # Licence
 
