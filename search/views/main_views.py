@@ -31,6 +31,7 @@ def home(request):
                 "search_preset_id": form.cleaned_data["search_preset"].id,
                 "no_private": form.cleaned_data["no_private"],
             }
+            print(calculated_address)
             return redirect("results")
     else:
         form = SearchForm()
@@ -95,6 +96,7 @@ def get_results(request):
             search_preset, (user_latitude, user_longitude), radius,
             no_private
         )
+        utils.get_all_addresses(results)
         for result in results:
             tags_count = utils.get_all_tags(results)
             tags_filter = utils.render_tag_filter(tags_count, len(results))

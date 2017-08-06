@@ -6,34 +6,93 @@ from math import sin, cos, atan2, degrees
 from goose import settings
 import overpass
 from collections import OrderedDict
+import requests
+import io
+
+import logging
 
 geolocator = geopy.geocoders.Nominatim(timeout=2000)
 
-def get_string_address(properties, coordinates):
+def try_geolocator_reverse(coords):
     """
-        Returns a human-readable address from the properties of
-        a POI and its coordinates.
+        Tries many times to get a geolocator object from coordinates,
+        or None.
     """
-    address_data = {
-        "street": properties.get("addr:street"),
-        "housenumber": properties.get("addr:housenumber"),
-        "city": properties.get("addr:city"),
-        "postcode": properties.get("addr:postcode")
-    }
-    if all(address_data.values()):
-        address = "Adresse exacte : {}, {}, {} {}".format(
-            address_data["housenumber"], address_data["street"],
-            address_data["postcode"], address_data["city"]
+    attempts = 0
+    while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
+        try:
+            position = geolocator.reverse(
+                coords, language="fr"
+            )
+            return position
+            break
+        except geopy.exc.GeopyError as e:
+            attempts += 1
+            if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
+                return None
+
+def try_geolocator_geocode(address):
+    """
+        Tries many times to get a geolocator object from an address,
+        or None.
+    """
+    attempts = 0
+    while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
+        try:
+            position = geolocator.geocode(
+                address, language="fr"
+            )
+            return position
+            break
+        except geopy.exc.GeopyError as e:
+            attempts += 1
+            if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
+                return None
+
+def get_address(coords=None, address=None, skip_gov_api=False):
+    """
+        Returns a tuple from a tuple of coordinates or an adress (str).
+        
+        Will first try to use the french government's API, then the
+        Overpass one, except if skip_gov_api is set to True.
+        
+        Returned tuple : ((lat (float), lon (float)), address (str))
+    """
+    if (not coords and not address) or (coords and address):
+        raise ValueError("One (and only one) of the two params must be given.")
+    result = None
+    if skip_gov_api is False:
+        if coords:
+            lat, lon = coords[0], coords[1]
+            r = requests.get(
+                "https://api-adresse.data.gouv.fr/reverse",
+                params={'lat': lat, 'lon': lon}
+            ).json()
+        else:
+            r = requests.get(
+                "https://api-adresse.data.gouv.fr/search",
+                params={'q': address}
+            ).json()
+        result = r.get("features")
+    if result:
+        result_lat, result_lon = (
+            result[0]["geometry"]['coordinates'][1],
+            result[0]["geometry"]['coordinates'][0]
         )
-    elif address_data["housenumber"] and address_data["street"]:
-        address = "Adresse exacte : {}, {}".format(
-            address_data["housenumber"], address_data["street"]
-        )
+        # TODO : Improve label.
+        result_address = result[0]["properties"]["label"]
     else:
-        geolocator_object = geolocator.reverse(coordinates, language="fr")
-        estimated_address = ', '.join(geolocator_object.address.split(',')[:5])
-        address = "Adresse estimée : {}".format(estimated_address)
-    return address
+        if coords:
+            r = try_geolocator_reverse(coords)
+            if not r:
+                return None
+        else:
+            r = try_geolocator_geocode(user_address)
+            if not r:
+                return None
+        result_lat, result_lon = r.latitude, r.longitude
+        result_address = r.address.split(',')[:5]
+    return ((result_lat, result_lon), result_address)
 
 def get_bearing(coords1, coords2):
     """
@@ -156,6 +215,50 @@ def get_all_tags(results):
                 tags_count[tag] = 1
     return tags_count
 
+def get_all_addresses(results):
+    """
+        Fills the addresses of the given results (list).
+        
+        Tries first with the french government's API, then with the
+        Overpass one for the addresses which couldn't be obtained.
+        
+        API doc : https://adresse.data.gouv.fr/api
+    """
+    # Creates a CSV to request the API.
+    csv = "latitude,longitude\n"
+    for result in results:
+        if result.default_address is '':
+            csv += str(result.coordinates[0]) + ',' + str(result.coordinates[1]) + '\n'
+    fake_file = io.StringIO(csv)
+    files = {'file': fake_file}
+    r = requests.post(
+        "https://api-adresse.data.gouv.fr/reverse/csv/",
+        files={'data': fake_file}
+    ).text
+    for csv_line, result in zip(r.splitlines()[1:], results):
+        if result.default_address is '':
+            parsed_line = csv_line.split(',')
+            address_data = [
+                parsed_line[8],
+                parsed_line[9],
+                parsed_line[11],
+                parsed_line[12]
+            ]
+            if all(address_data):
+                address = "Adresse estimée : {housenumber} {street}, {postcode} {city}".format(
+                    housenumber=address_data[0],
+                    street=address_data[1],
+                    postcode=address_data[2],
+                    city=address_data[3]
+                )
+            else:
+                address = get_address(
+                    coords=(result.coordinates[0], result.coordinates[1]),
+                    skip_gov_api=True
+                )
+            result.string_address = address
+    return
+
 class Result:
     """
         A result and its properties.
@@ -176,7 +279,8 @@ class Result:
         self.user_coords = user_coordinates
         self.search_preset = search_preset
         self.properties = geojson["properties"]
-        self.string_address = get_string_address(self.properties, self.coordinates)
+        self.default_address = self.get_default_address()
+        self.string_address = ""
         self.distance = round(distance.vincenty(
             (user_coordinates[0], user_coordinates[1]), self.coordinates
         ).m)
@@ -190,11 +294,43 @@ class Result:
                 self.opening_hours = humanized_opening_hours.HumanizedOpeningHours(
                     oh_field, "fr", tz=pytz.timezone("Europe/Paris")
                 )
+            # TODO : Handle only HOH errors.
             except humanized_opening_hours.HOHError:
+                # TODO : Log and warn user.
+                self.opening_hours = None
+            except Exception as e:
                 # TODO : Log and warn user.
                 self.opening_hours = None
         self.tags = []
         return
+    
+    def get_address(self):
+        if self.default_address:
+            return self.default_address
+        elif self.string_address:
+            return self.string_address
+        else:
+            # TODO : Log.
+            return "Adresse : Adresse inconnue"
+    
+    def get_default_address(self):
+        address_data = {
+            "street": self.properties.get("addr:street"),
+            "housenumber": self.properties.get("addr:housenumber"),
+            "city": self.properties.get("addr:city"),
+            "postcode": self.properties.get("addr:postcode")
+        }
+        if all(address_data.values()):
+            return "Adresse exacte : {}, {}, {} {}".format(
+                address_data["housenumber"], address_data["street"],
+                address_data["postcode"], address_data["city"]
+            )
+        elif address_data["housenumber"] and address_data["street"]:
+            return "Adresse exacte : {}, {}".format(
+                address_data["housenumber"], address_data["street"]
+            )
+        else:
+            return ''
     
     def get_tags(self):
         """
@@ -264,7 +400,7 @@ class Result:
         data.append("Direction : {degrees}° {direction}\n".format(
             degrees=self.bearing, direction=self.direction
         ))
-        data.append(self.string_address)
+        data.append(self.get_address())
         
         result_properties = self.search_preset.render_pr(self.properties)
         
