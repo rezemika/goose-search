@@ -8,10 +8,11 @@ import overpass
 from collections import OrderedDict
 import requests
 import io
-
 import logging
+from uuid import uuid4
 
 geolocator = geopy.geocoders.Nominatim(timeout=2000)
+debug_logger = logging.getLogger("DEBUG")
 
 def try_geolocator_reverse(coords):
     """
@@ -29,6 +30,9 @@ def try_geolocator_reverse(coords):
         except geopy.exc.GeopyError as e:
             attempts += 1
             if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
+                debug_logger.error(
+                    "Too much geopy errors ({}). Aborting.".format(str(e))
+                )
                 return None
 
 def try_geolocator_geocode(address):
@@ -47,6 +51,9 @@ def try_geolocator_geocode(address):
         except geopy.exc.GeopyError as e:
             attempts += 1
             if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
+                debug_logger.error(
+                    "Too much geopy errors ({}). Aborting.".format(str(e))
+                )
                 return None
 
 def get_address(coords=None, address=None, skip_gov_api=False):
@@ -119,6 +126,9 @@ def get_results(search_preset, user_coords, radius, no_private):
     """
         Returns a list of dicts with the properties of all results.
     """
+    debug_logger.debug(
+        "Getting results. SearchPreset: {}.".format(search_preset.id)
+    )
     api = overpass.API()
     response = []
     results = []
@@ -132,19 +142,25 @@ def get_results(search_preset, user_coords, radius, no_private):
             lat=user_coords[0], lon=user_coords[1]
         )
         attempts = 0
+        debug_logger.debug("Requesting '{}'".format(line))
         while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
             try:
                 response += api.Get(request)['features']
+                debug_logger.debug("Request successfull.")
                 break
             except overpass.OverpassError as e:
                 attempts += 1
                 if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
+                    debug_logger.debug(
+                        "Error: {}. Raising of 500 error.".format(str(e))
+                    )
                     raise e
     for element in response:
         if no_private and element["properties"].get("access") in ["private", "no"]:
             continue
-        results.append(Result(element, search_preset, user_coords))
+        results.append(Result(str(uuid4()), element, search_preset, user_coords))
     results = sorted(results, key=lambda result: result.distance)
+    debug_logger.debug("Got {} result(s).".format(len(results)))
     return results
 
 def render_tag_filter(tags, count):
@@ -225,45 +241,81 @@ def get_all_addresses(results):
         API doc : https://adresse.data.gouv.fr/api
     """
     # Creates a CSV to request the API.
-    csv = "latitude,longitude\n"
+    debug_logger.debug("Getting addresses of results.")
+    debug_logger.debug(results)
+    csv = "latitude,longitude,uuid\n"
     for result in results:
         if result.default_address is '':
-            csv += str(result.coordinates[0]) + ',' + str(result.coordinates[1]) + '\n'
+            csv += str(result.coordinates[0]) + ',' + str(result.coordinates[1]) + ',' + result.uuid + '\n'
+    debug_logger.debug("CSV created.")
+    debug_logger.debug("Content:\n" + csv)
     fake_file = io.StringIO(csv)
     files = {'file': fake_file}
     r = requests.post(
         "https://api-adresse.data.gouv.fr/reverse/csv/",
         files={'data': fake_file}
-    ).text
-    for csv_line, result in zip(r.splitlines()[1:], results):
-        if result.default_address is '':
-            parsed_line = csv_line.split(',')
-            address_data = [
-                parsed_line[8],
-                parsed_line[9],
-                parsed_line[11],
-                parsed_line[12]
-            ]
-            if all(address_data):
-                address = "Adresse estimée : {housenumber} {street}, {postcode} {city}".format(
-                    housenumber=address_data[0],
-                    street=address_data[1],
-                    postcode=address_data[2],
-                    city=address_data[3]
-                )
-            else:
-                address = get_address(
-                    coords=(result.coordinates[0], result.coordinates[1]),
-                    skip_gov_api=True
-                )
-            result.string_address = address
+    )
+    debug_logger.debug(
+        "Request sent. API returned {} status code. URL: {}".format(
+            r.status_code, r.url
+        )
+    )
+    debug_logger.debug('\n' + r.text)
+    for csv_line in r.text.splitlines()[1:]:
+        parsed_line = csv_line.split(',')
+        current_uuid = str(parsed_line[2])
+        for result in results:
+            if result.uuid != current_uuid:
+                continue
+            # Gets the estimated address only if the true address
+            # is not in the result's OSM tags.
+            if result.default_address is '':
+                address_data = [
+                    parsed_line[9],
+                    parsed_line[10],
+                    parsed_line[12],
+                    parsed_line[13]
+                ]
+                if all(address_data):
+                    debug_logger.debug(
+                        "The address from '{}' is correct (OSM_ID: {}).".format(
+                            csv_line,
+                            result.osm_meta[1]
+                        )
+                    )
+                    address = "Adresse estimée : {housenumber} {street}, {postcode} {city}".format(
+                        housenumber=address_data[0],
+                        street=address_data[1],
+                        postcode=address_data[2],
+                        city=address_data[3]
+                    )
+                else:  # If the address is not in France (or in case of error).
+                    debug_logger.debug(
+                        "One or more informations are missing for the address '{}' (OSM_ID: {}).".format(
+                            csv_line,
+                            result.osm_meta[1]
+                        )
+                    )
+                    address = get_address(
+                        coords=(result.coordinates[0], result.coordinates[1]),
+                        skip_gov_api=True
+                    )
+                    if not address:
+                        debug_logger.error(
+                            "The address of result could not be obtained. (OSM_ID: {}).".format(
+                                result.osm_meta[1]
+                            )
+                        )
+                result.string_address = address
+    debug_logger.debug("Address getting finished successfully.")
     return
 
 class Result:
     """
         A result and its properties.
     """
-    def __init__(self, geojson, search_preset, user_coordinates):
+    def __init__(self, uuid, geojson, search_preset, user_coordinates):
+        self.uuid = uuid
         if geojson['geometry']['type'] == "Point":
             self.osm_meta = ("node", geojson["id"])
             self.coordinates = (
@@ -294,12 +346,24 @@ class Result:
                 self.opening_hours = humanized_opening_hours.HumanizedOpeningHours(
                     oh_field, "fr", tz=pytz.timezone("Europe/Paris")
                 )
-            # TODO : Handle only HOH errors.
             except humanized_opening_hours.HOHError:
-                # TODO : Log and warn user.
+                # TODO : Warn user ?
+                debug_logger.error(
+                    "Opening hours - HOHError ; OSM_ID: '{id}' ; opening_hours: '{oh}'".format(
+                        id=self.osm_meta[1],
+                        oh=oh_field
+                    )
+                )
                 self.opening_hours = None
             except Exception as e:
-                # TODO : Log and warn user.
+                # TODO : Warn user ?
+                debug_logger.error(
+                    "Opening hours - Error ; Exception: '{exception}' ; OSM_ID: '{id}' ; opening_hours: '{oh}'".format(
+                        exception=str(e),
+                        id=self.osm_meta[1],
+                        oh=oh_field
+                    )
+                )
                 self.opening_hours = None
         self.tags = []
         return
@@ -310,7 +374,13 @@ class Result:
         elif self.string_address:
             return self.string_address
         else:
-            # TODO : Log.
+            debug_logger.error(
+                "Getting address - Error ; OSM_ID: '{id}' ; Coordinates: {lat}/{lon}".format(
+                    id=self.osm_meta[1],
+                    lat=self.coordinates[0],
+                    lon=self.coordinates[1]
+                )
+            )
             return "Adresse : Adresse inconnue"
     
     def get_default_address(self):

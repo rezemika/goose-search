@@ -11,6 +11,8 @@ import overpass
 import logging
 import json
 
+debug_logger = logging.getLogger("DEBUG")
+
 def home(request):
     """
         The main page of Goose. Shows the search form, validate it
@@ -76,6 +78,7 @@ def get_results(request):
     """
     if not request.is_ajax():
         return HttpResponseForbidden("This URL if for Ajax only.")
+    debug_logger.debug("----- A new request is coming! -----")
     search_preset_id = request.POST["search_preset_id"]
     search_preset = SearchPreset.objects.get(id=search_preset_id)
     radius = request.POST["radius"]
@@ -102,15 +105,19 @@ def get_results(request):
             tags_filter = utils.render_tag_filter(tags_count, len(results))
             rendered_results.append("<li>" + result.render() + "</li>")
         status = "ok"
+        debug_logger.debug("Request successfull!")
     except geopy.exc.GeopyError as e:
         err_msg = "Une erreur s'est produite lors de l'acquisition de vos coordonnées. Vous pouvez essayer de recharger la page dans quelques instants."
         debug_msg = str(e)
+        debug_logger.debug("Geopy error: {exception}".format(str(e)))
     except overpass.OverpassError as e:
         err_msg = "Une erreur s'est produite lors de la requête vers les serveurs d'OpenStreetMap. Vous pouvez essayer de recharger la page dans quelques instants."
         debug_msg = str(e)
+        debug_logger.debug("Overpass error: {exception}".format(str(e)))
     except Exception as e:
         err_msg = "Une erreur non prise en charge s'est produite."
         debug_msg = str(e)
+        debug_logger.debug("Unhandled error: {exception}".format(str(e)))
     # Logs the request to make statistics.
     # Doesn't logs if the request comes from an authenticated user,
     # as it is probably an admin.

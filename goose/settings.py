@@ -170,6 +170,12 @@ LOGGING = {
             'class': 'logging.FileHandler',
             'filename': BASE_DIR + '/logs/statistics.log',
             'formatter': 'simple'
+        },
+        'debug_handler': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR + '/logs/debug.log',
+            'formatter': 'simple'
         }
     },
     'loggers': {
@@ -195,7 +201,7 @@ LOGGING = {
             'propagate': True,
         },
         'DEBUG': {
-            'handlers': ['console'],
+            'handlers': ['console', 'debug_handler'],
             'level': 'DEBUG',
             'propagate': True,
         }
