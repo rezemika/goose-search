@@ -23,13 +23,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'UP)l=+LqM>|#M4Ll\J:I7l3VEB[/SkL9oS&MtNw){`ES<z,UfQ'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 if DEBUG is True:
     ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = ['goose-sear.ch', 'www.goose-sear.ch']
-
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -173,6 +173,7 @@ LOGGING = {
         },
         'debug_handler': {
             'level': 'DEBUG',
+            'filters': ['require_debug_true'],
             'class': 'logging.FileHandler',
             'filename': BASE_DIR + '/logs/debug.log',
             'formatter': 'simple'
@@ -219,7 +220,7 @@ GOOSE_META = {
         "Un moteur de recherche géographique léger utilisant "
         "OpenStreetMap pour chercher des points d'intérêt à proximité."
     ),
-    "version": "0.2.0",
+    "version": "0.2.1",
     "max_geolocation_attempts": 3,
 }
 
