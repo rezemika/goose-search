@@ -33,7 +33,6 @@ def home(request):
                 "search_preset_id": form.cleaned_data["search_preset"].id,
                 "no_private": form.cleaned_data["no_private"],
             }
-            print(calculated_address)
             return redirect("results")
     else:
         form = SearchForm()

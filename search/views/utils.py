@@ -267,54 +267,53 @@ def get_all_addresses(results):
         for result in results:
             if result.uuid != current_uuid:
                 continue
-            # Gets the estimated address only if the true address
-            # is not in the result's OSM tags.
-            if result.default_address is '':
-                address_data = [
-                    parsed_line[9],
-                    parsed_line[10],
-                    parsed_line[12],
-                    parsed_line[13]
-                ]
-                if all(address_data):
-                    debug_logger.debug(
-                        "The address from '{}' is correct (OSM_ID: {}).".format(
-                            csv_line,
+            address_data = [
+                parsed_line[9],
+                parsed_line[10],
+                parsed_line[12],
+                parsed_line[13]
+            ]
+            # Checks address_data contains at least one information,
+            # and / including the street name.
+            if any(address_data) and address_data[1]:
+                debug_logger.debug(
+                    "The address from '{}' is correct (OSM_ID: {}).".format(
+                        csv_line,
+                        result.osm_meta[1]
+                    )
+                )
+                address = "Adresse estimée : {housenumber} {street}, {postcode} {city}".format(
+                    housenumber=address_data[0],
+                    street=address_data[1],
+                    postcode=address_data[2],
+                    city=address_data[3]
+                )
+            else:  # If the address is not in France (or in case of error).
+                debug_logger.debug(
+                    "One or more informations are missing for the address '{}' (OSM_ID: {}).".format(
+                        csv_line,
+                        result.osm_meta[1]
+                    )
+                )
+                address = get_address(
+                    coords=(result.coordinates[0], result.coordinates[1]),
+                    skip_gov_api=True
+                )
+                if not address:
+                    debug_logger.error(
+                        "The address of result could not be obtained. (OSM_ID: {}).".format(
                             result.osm_meta[1]
                         )
                     )
+                else:
+                    address = address[1]
                     address = "Adresse estimée : {housenumber} {street}, {postcode} {city}".format(
-                        housenumber=address_data[0],
-                        street=address_data[1],
-                        postcode=address_data[2],
-                        city=address_data[3]
+                        housenumber=address[0],
+                        street=address[1],
+                        postcode=address[2],
+                        city=address[3]
                     )
-                else:  # If the address is not in France (or in case of error).
-                    debug_logger.debug(
-                        "One or more informations are missing for the address '{}' (OSM_ID: {}).".format(
-                            csv_line,
-                            result.osm_meta[1]
-                        )
-                    )
-                    address = get_address(
-                        coords=(result.coordinates[0], result.coordinates[1]),
-                        skip_gov_api=True
-                    )
-                    if not address:
-                        debug_logger.error(
-                            "The address of result could not be obtained. (OSM_ID: {}).".format(
-                                result.osm_meta[1]
-                            )
-                        )
-                    else:
-                        address = address[1]
-                        address = "Adresse estimée : {housenumber} {street}, {postcode} {city}".format(
-                            housenumber=address[0],
-                            street=address[1],
-                            postcode=address[2],
-                            city=address[3]
-                        )
-                result.string_address = address
+            result.string_address = address
     debug_logger.debug("Address getting finished successfully.")
     return
 
@@ -502,6 +501,8 @@ class Result:
         
         data.append('\n' + result_properties)
         debug_logger.debug(data)
+        # Removes unusefull linebreaks.
+        data = [output_data for output_data in data if output_data is not '\n']
         content += '\n'.join(data)
         
         if itinerary:
