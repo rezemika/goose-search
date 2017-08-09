@@ -11,7 +11,7 @@ import io
 import logging
 from uuid import uuid4
 
-geolocator = geopy.geocoders.Nominatim(timeout=2000)
+geolocator = geopy.geocoders.Nominatim(timeout=10)
 debug_logger = logging.getLogger("DEBUG")
 
 def try_geolocator_reverse(coords):
@@ -306,6 +306,14 @@ def get_all_addresses(results):
                                 result.osm_meta[1]
                             )
                         )
+                    else:
+                        address = address[1]
+                        address = "Adresse estimée : {housenumber} {street}, {postcode} {city}".format(
+                            housenumber=address[0],
+                            street=address[1],
+                            postcode=address[2],
+                            city=address[3]
+                        )
                 result.string_address = address
     debug_logger.debug("Address getting finished successfully.")
     return
@@ -474,19 +482,26 @@ class Result:
         
         result_properties = self.search_preset.render_pr(self.properties)
         
-        if opening_hours and self.opening_hours is not None:
-            opening_hours_text = self.opening_hours.stringify_week_schedules()
-            oh_content = ('<button type="button" class="btn btn-default"'
-                ' data-toggle="popover" title="Horaires d\'ouverture"'
-                ' data-content="{}" data-html="true"'
-                ' data-placement="right">'
-                '<span class="glyphicon glyphicon-time inline-icon"'
-                ' aria-hidden="true"></span>Horaires d\'ouverture</button>'
-            ).format(opening_hours_text.replace("\n", "<br>"))
-            data.append('\n' + oh_content)
+        try:
+            if opening_hours and self.opening_hours is not None:
+                opening_hours_text = self.opening_hours.stringify_week_schedules()
+                oh_content = ('<button type="button" class="btn btn-default"'
+                    ' data-toggle="popover" title="Horaires d\'ouverture"'
+                    ' data-content="{}" data-html="true"'
+                    ' data-placement="right">'
+                    '<span class="glyphicon glyphicon-time inline-icon"'
+                    ' aria-hidden="true"></span>Horaires d\'ouverture</button>'
+                ).format(opening_hours_text.replace("\n", "<br>"))
+                data.append('\n' + oh_content)
+        except Exception as e:
+            debug_logger.error(
+                "Error of HOH ({}) on rendering opening hours of the result (OSM_ID: {}).".format(
+                    str(e), self.osm_meta[1]
+                )
+            )
         
         data.append('\n' + result_properties)
-        
+        debug_logger.debug(data)
         content += '\n'.join(data)
         
         if itinerary:
