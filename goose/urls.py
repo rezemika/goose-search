@@ -13,9 +13,10 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url
+from django.conf.urls import include, url
 from django.contrib import admin
 from search.views import main_views
+from goose import settings
 
 urlpatterns = [
     url(r'^$', main_views.home, name='home'),
@@ -24,3 +25,9 @@ urlpatterns = [
     url(r'^about/$', main_views.about, name='about'),
     url(r'^admin/', admin.site.urls)
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns

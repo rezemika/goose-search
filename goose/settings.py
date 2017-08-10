@@ -23,13 +23,15 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'UP)l=+LqM>|#M4Ll\J:I7l3VEB[/SkL9oS&MtNw){`ES<z,UfQ'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
+
+INTERNAL_IPS = ('127.0.0.1', )
 
 if DEBUG is True:
     ALLOWED_HOSTS = ['*']
 else:
     ALLOWED_HOSTS = ['goose-sear.ch', 'www.goose-sear.ch']
-ALLOWED_HOSTS = ['*']
+
 
 # Application definition
 
@@ -41,9 +43,11 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'search',
+    'debug_toolbar',
 ]
 
 MIDDLEWARE = [
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
