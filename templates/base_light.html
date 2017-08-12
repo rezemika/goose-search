@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="fr">
+    <head>
+        <title>{% block title %}Goose{% endblock %}</title>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+        <meta name="generator" content="Geany 1.27"/>
+        <meta name="description" content={{ GOOSE_META.description }}/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+    
+    <body>
+        <nav class="navbar">
+            <a class="navbar-brand" href="{% url 'light' %}">Goose Light</a>
+            <ul class="navbar-links">
+                <li><a href="{% url 'light' %}">Recherche light</a></li>
+                <li><a href="{% url 'light-about' %}">À propos</a></li>
+                <li><a href="{% url 'home' %}">Version classique</a></li>
+            </ul>
+            <a class="navbar-text" href="https://github.com/rezemika/goose-search">Version {{ GOOSE_META.version }}</a>
+        </nav>
+        
+        <div id="content" class="container-fluid">
+            {% block content %}{% endblock %}
+        </div>
+        
+        <style>
+            .navbar-brand {
+                font-style: bold;
+                font-weight: 700;
+                font-size: 1.5em;
+            }
+            .navbar-links {
+                list-style-type: none;
+                display: inline;
+            }
+            .navbar-links li {
+                display: inline;
+                padding-left: 20px;
+            }
+            .navbar-text {
+                float: right;
+                padding-right: 10px;
+            }
+            #content {
+                margin-left: 10px;
+                margin-right: 10px;
+            }
+        </style>
+    </body>
+</html>

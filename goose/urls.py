@@ -23,6 +23,8 @@ urlpatterns = [
     url(r'^results/$', main_views.results, name='results'),
     url(r'^getresults/$', main_views.get_results, name='getresults'),
     url(r'^about/$', main_views.about, name='about'),
+    url(r'^light/$', main_views.light_home, name='light'),
+    url(r'^light/about/$', main_views.about, name='light-about'),
     url(r'^admin/', admin.site.urls)
 ]
 

@@ -1,14 +1,11 @@
-{% extends "base.html" %}
+{% extends base_template %}
 {% block content %}
     <h1>À propos de Goose</h1>
     <h3>Goose <small>Offers an Openstreetmap Search Engine</small></h3>
-    <br>
     <p>Ce site est un moteur de recherche géographique créé par rezemika. Ses résultats sont extraits des données d'OpenStreetMap sous la licence ODbL. Ce site est géré par le framework Django 1.10 avec Python3 et est stylisé avec Bootstrap 3. Il utilise aussi Javascript et jQuery 3 pour l'interactivité.</p>
     <p>Son nom est un acronyme récursif : <i>Goose Offers an Openstreetmap Search Engine</i>.</p>
     <p>Goose est actuellement en version <b>{{ GOOSE_META.version }}</b>. Voici son dépôt Github : <a href="https://github.com/rezemika/goose-search">goose-search</a>.</p>
     <p>Son logo provient quand à lui de <a href="https://www.freefavicon.com/freefavicons/animal/iconinfo/goose----152-248178.html">freefavicon.com</a>.</p>
-    <br>
     <h3>Vie privée</h3>
     <p>Lors d'une recherche, Goose enregistre certaines informations à des fins statistiques. Ces informations sont : l'objet de la recherche, le rayon de recherche, ainsi que les coordonnées GPS arrondies au degré décimal. Ainsi, il est impossible de connaitre votre position à partir d'une requête faite sur Goose avec une précision meilleure que 130km environ (à la latitude de la France). Enfin, Goose n'utilise aucun outil ou script provenant de Google, Facebook ou Twitter.</p>
-    <br>
 {% endblock %}

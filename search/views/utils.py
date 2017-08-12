@@ -457,7 +457,7 @@ class Result:
         self.tags = tags
         return tags
     
-    def render(self, render_tags=True, link_to_osm=True, opening_hours=True, itinerary=True):
+    def render(self, render_tags=True, link_to_osm=True, opening_hours=True, oh_in_popover=True, itinerary=True):
         """
             Returns an HTML div (with "result-box" class) displaying
             a result and its properties.
@@ -477,6 +477,17 @@ class Result:
         data.append("Direction : {degrees}° {direction}\n".format(
             degrees=self.bearing, direction=self.direction
         ))
+        
+        phone = self.properties.get("phone")
+        if phone:
+            data.append(
+                (
+                    '<span class="glyphicon glyphicon-phone-alt '
+                    'inline-icon" aria-hidden="true"></span>Téléphone : '
+                    '<a href="tel:{phone}">{phone}</a>\n'
+                ).format(phone=phone)
+            )
+        
         data.append(self.get_address())
         
         result_properties = self.search_preset.render_pr(self.properties)
@@ -484,13 +495,19 @@ class Result:
         try:
             if opening_hours and self.opening_hours is not None:
                 opening_hours_text = self.opening_hours.stringify_week_schedules()
-                oh_content = ('<button type="button" class="btn btn-default"'
-                    ' data-toggle="popover" title="Horaires d\'ouverture"'
-                    ' data-content="{}" data-html="true"'
-                    ' data-placement="right">'
-                    '<span class="glyphicon glyphicon-time inline-icon"'
-                    ' aria-hidden="true"></span>Horaires d\'ouverture</button>'
-                ).format(opening_hours_text.replace("\n", "<br>"))
+                if oh_in_popover:
+                    oh_content = (
+                        '<button type="button" class="btn btn-default"'
+                        ' data-toggle="popover" title="Horaires d\'ouverture"'
+                        ' data-content="{}" data-html="true"'
+                        ' data-placement="right">'
+                        '<span class="glyphicon glyphicon-time inline-icon"'
+                        ' aria-hidden="true"></span>Horaires d\'ouverture</button>'
+                    ).format(opening_hours_text.replace("\n", "<br>"))
+                else:
+                    oh_content = (
+                        '<div class="small-box">{}</div>'
+                    ).format(opening_hours_text.replace("\n", "<br>"))
                 data.append('\n' + oh_content)
         except Exception as e:
             debug_logger.error(

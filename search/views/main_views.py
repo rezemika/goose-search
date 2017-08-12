@@ -18,6 +18,7 @@ def home(request):
         The main page of Goose. Shows the search form, validate it
         and redirect to "results" if it's correct.
     """
+    base_template = "base.html"
     if request.method == "POST":
         form = SearchForm(request.POST)
         if form.is_valid():
@@ -138,11 +139,100 @@ def get_results(request):
         content_type="application/json"
     )
 
+# TODO : ratelimit
+#@ratelimit(key='ip', rate="10/m")
+def light_home(request):
+    """
+        The main page of the light version of Goose.
+        The results are displayed on the same page
+        to avoid a redirection.
+    """
+    base_template = "base_light.html"
+    if request.method != "POST":
+        form = SearchForm()
+        return render(request, "search/geo.html", locals())
+    form = SearchForm(request.POST)
+    was_limited = getattr(request, 'limited', False)
+    if was_limited:
+        limit_error = (
+            "<center><em>Trop peu de requêtes ont été faites en trop "
+            "peu de temps. Merci d'attendre quelques secondes avant "
+            "de raffraichir la page.</em></center>"
+        )
+        return render(request, "search/geo.html", locals())
+    if not form.is_valid():
+        return render(request, "search/geo.html", locals())
+    form.clean()
+    search_preset = form.cleaned_data["search_preset"]
+    user_latitude = form.cleaned_data["user_latitude"]
+    user_longitude = form.cleaned_data["user_longitude"]
+    user_address = form.cleaned_data["calculated_address"]
+    radius = form.cleaned_data["radius"]
+    no_private = form.cleaned_data["no_private"]
+    user_coords = (user_latitude, user_longitude)
+    search_description = '"{}" dans un rayon de {} mètres.'.format(search_preset.name, radius)
+    if no_private is True:
+        search_description += " Exclusion des résultats à accès privé."
+    else:
+        search_description += " Inclusion des résultats à accès privé."
+    rendered_results = []
+    status = "error"
+    err_msg = ""
+    try:
+        results = utils.get_results(
+            search_preset, user_coords, radius,
+            no_private
+        )
+        utils.get_all_addresses(results)
+        for result in results:
+            tags_count = utils.get_all_tags(results)
+            tags_filter = utils.render_tag_filter(tags_count, len(results))
+            rendered_results.append(str(
+                "<li>" + result.render(
+                    render_tags=False, oh_in_popover=False
+                ).replace('\n', '<br/>') + "</li>"
+            ))
+        status = "ok"
+        debug_logger.debug("Request successfull!")
+    except geopy.exc.GeopyError as e:
+        err_msg = "Une erreur s'est produite lors de l'acquisition de vos coordonnées. Vous pouvez essayer de recharger la page dans quelques instants."
+        debug_logger.debug("Geopy error: {exception}".format(str(e)))
+    except overpass.OverpassError as e:
+        err_msg = "Une erreur s'est produite lors de la requête vers les serveurs d'OpenStreetMap. Vous pouvez essayer de recharger la page dans quelques instants."
+        debug_logger.debug("Overpass error: {exception}".format(str(e)))
+    except Exception as e:
+        err_msg = "Une erreur non prise en charge s'est produite."
+        debug_logger.debug("Unhandled error: {exception}".format(str(e)))
+    # Logs the request to make statistics.
+    # Doesn't logs if the request comes from an authenticated user,
+    # as it is probably an admin.
+    if not request.user.is_authenticated():
+        logger = logging.getLogger("statistics")
+        logger.info(
+            "search:{id}:{radius}:{lat}:{lon}".format(
+                id=search_preset_id,
+                radius=radius,
+                # Rounds the stored coordinates for privacy's sake.
+                lat=round(user_latitude),
+                lon=round(user_longitude)
+            )
+        )
+    
+    return render(request, "search/light_results.html", {
+        "results": rendered_results, "user_coords": user_coords,
+        "user_address": user_address, "search_description": search_description,
+        "status": status, "err_msg": err_msg
+    })
+
 def about(request):
     """
         The about page, providing some informations about the site itself.
     """
+    if "/light/" in request.path:
+        base_template = "base_light.html"
+    else:
+        base_template = "base.html"
     # Logs the request to make statistics.
     logger = logging.getLogger("statistics")
     logger.info("about_page")
-    return render(request, "search/about.html")
+    return render(request, "search/about.html", {"base_template": base_template})

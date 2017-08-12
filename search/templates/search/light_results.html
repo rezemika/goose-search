@@ -1,0 +1,77 @@
+{% extends "base_light.html" %}
+{% load static %}
+{% load geo_extras %}
+
+{% block content %}
+    <h2>Résultats de la recherche</h2>
+    <div class="small-box" role="complementary">
+        <p>Voici votre localisation estimée :</p>
+        <ul>
+            <li>Latitude : {{ user_coords.0|render_coordinate }}</li>
+            <li>Longitude : {{ user_coords.1|render_coordinate }}</li>
+            <li>Adresse : {{ user_address }}</li>
+        </ul>
+        <p>Recherche : {{ search_description }}</p>
+        <p>Les résultats sont triés par ordre croissant de distance par rapport à votre position. Les liens de guidage sont prévus pour des piétons.</p>
+    </div>
+    <br/>
+    <form action="{% url 'home' %}"><input type="submit" value="Nouvelle recherche" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
+    <hr>
+    <div id="results_list">
+        {% for result in results %}
+            {{ result|safe }}
+        {% empty %}
+            <center><em>Pas de résultats.</em></center>
+        {% endfor %}
+    </div>
+    <style>
+        #content {
+            margin-left: 75px;
+            margin-right: 75px;
+            margin-bottom: 30px;
+        }
+        .result-box {
+            margin-bottom: 1em;
+            border: solid 1px;
+            border-color: grey;
+            border-radius: 1em;
+            width: 90%;
+            padding: 1em;
+        }
+        @media (max-width: 767px) {
+            #content {
+                margin-left: 2px;
+                margin-right: 2px;
+            }
+            
+            .result-box {
+                width: 95%;
+                padding: 0.5em;
+            }
+            
+            #results_list {
+                padding: 0;
+                list-style-type: none;
+            }
+        }
+        #results_list {
+            list-style:none
+        }
+        .small-box {
+            margin-bottom: 0.5em;
+            padding: 0.2em;
+            border: solid 1px;
+            border-color: grey;
+            border-radius: 1em;
+            width: auto;
+            padding: 0.5em;
+        }
+        em {
+            font-weight: bold;
+            font-size: 110%;
+        }
+        .osm-link-logo {
+            float: right;
+        }
+    </style>
+{% endblock %}
