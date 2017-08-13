@@ -224,7 +224,6 @@ GOOSE_META = {
         "Un moteur de recherche géographique léger utilisant "
         "OpenStreetMap pour chercher des points d'intérêt à proximité."
     ),
-    "version": "0.2.1",
     "max_geolocation_attempts": 3,
 }
 

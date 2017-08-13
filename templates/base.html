@@ -37,12 +37,12 @@
                     <ul class="nav navbar-nav">
                         <li><a href="{% url 'home' %}">Recherche</a></li>
                         <li><a href="{% url 'light' %}">Light</a></li>
-                        <li><a href="{% url 'about' %}">À propos</a></li>
+                        <li><a href="{% url 'about' %}">À propos  </a></li>
                         {% if user.is_authenticated %}<li><a href="/admin">Administration</a></li>{% endif %}
                     </ul>
                     <div class="navbar-right">
-                        <p class="navbar-text navbar-right version">Version {{ GOOSE_META.version }}
-                            <a class="navbar-brand github-logo" href="https://github.com/rezemika/goose-search">
+                        <p class="navbar-text navbar-right version"><a style="color:white;" href="{{ VERSION.version_url }}">{{ VERSION.name }}</a>
+                            <a class="navbar-brand github-logo" href="{{ VERSION.github_url }}">
                                 <img alt="Goose" src="{% static 'images/GitHub-Mark-32px.png' %}"/>
                             </a>
                         </p>
