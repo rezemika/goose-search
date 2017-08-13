@@ -18,13 +18,8 @@ function filter_results_handler (object) {
         spans = li[i].getElementsByTagName("span");
         last_span = spans[spans.length - 1];
         result_tags = last_span.innerHTML.split(';');
-        // Checks all the result tags are in the active filters.
-        show_result = true;
-        for (j = 0; j < result_tags.length; j++) {
-            if (active_filters.indexOf(result_tags[j]) == -1) {
-                show_result = false;
-            }
-        }
+        // Checks all the result tags are included in the active filters.
+        show_result = result_tags.every(tag => active_filters.indexOf(tag) > -1);
         if (show_result == true) {
             console.log("Result " + i + ": showed");
             li[i].style.display = "block";
