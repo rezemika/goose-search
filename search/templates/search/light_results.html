@@ -15,7 +15,9 @@
         <p>Les résultats sont triés par ordre croissant de distance par rapport à votre position. Les liens de guidage sont prévus pour des piétons.</p>
     </div>
     <br/>
-    <form action="{% url 'home' %}"><input type="submit" value="Nouvelle recherche" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
+    <center><form action="{% url 'home' %}"><input type="submit" value="Nouvelle recherche" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
+    {% if results %}<br/>
+    <em>{{ results|length }} résultat{{ results|pluralize }}</em></center>{% endif %}
     <hr>
     <div id="results_list">
         {% for result in results %}
