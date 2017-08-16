@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseForbidden
+from django.utils.html import escape
 from search.models import SearchPreset
 from search.forms import SearchForm
 from ratelimit.decorators import ratelimit
@@ -52,7 +53,7 @@ def results(request):
     search_preset = SearchPreset.objects.get(id=search_preset_id)
     user_latitude = request.session["search_form"]["user_latitude"]
     user_longitude = request.session["search_form"]["user_longitude"]
-    user_address = request.session["search_form"]["user_address"]
+    user_address = escape(request.session["search_form"]["user_address"])
     radius = request.session["search_form"]["radius"]
     no_private = request.session["search_form"]["no_private"]
     search_description = '"{}" dans un rayon de {} mètres.'.format(search_preset.name, radius)
@@ -139,8 +140,9 @@ def get_results(request):
         content_type="application/json"
     )
 
-# TODO : ratelimit
-#@ratelimit(key='ip', rate="10/m")
+# Higher ratelimit, because users of light version may have
+# network troubles (like load interruptions).
+@ratelimit(key='ip', rate="10/m")
 def light_home(request):
     """
         The main page of the light version of Goose.
@@ -166,7 +168,7 @@ def light_home(request):
     search_preset = form.cleaned_data["search_preset"]
     user_latitude = form.cleaned_data["user_latitude"]
     user_longitude = form.cleaned_data["user_longitude"]
-    user_address = form.cleaned_data["calculated_address"]
+    user_address = escape(form.cleaned_data["calculated_address"])
     radius = form.cleaned_data["radius"]
     no_private = form.cleaned_data["no_private"]
     user_coords = (user_latitude, user_longitude)

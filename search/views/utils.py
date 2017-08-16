@@ -10,6 +10,7 @@ import requests
 import io
 import logging
 from uuid import uuid4
+from django.utils.html import escape
 
 geolocator = geopy.geocoders.Nominatim(timeout=10)
 debug_logger = logging.getLogger("DEBUG")
@@ -346,7 +347,7 @@ class Result:
         self.bearing = get_bearing(user_coordinates, self.coordinates)
         self.direction = deg2dir(self.bearing)
         # TODO : Make it independent to timezones ?
-        oh_field = self.properties.get("opening_hours")
+        oh_field = escape(self.properties.get("opening_hours"))
         self.opening_hours = None
         if oh_field:
             try:
@@ -399,12 +400,15 @@ class Result:
         }
         if all(address_data.values()):
             return "Adresse exacte : {}, {}, {} {}".format(
-                address_data["housenumber"], address_data["street"],
-                address_data["postcode"], address_data["city"]
+                escape(address_data["housenumber"]),
+                escape(address_data["street"]),
+                escape(address_data["postcode"]),
+                escape(address_data["city"])
             )
         elif address_data["housenumber"] and address_data["street"]:
             return "Adresse exacte : {}, {}".format(
-                address_data["housenumber"], address_data["street"]
+                escape(address_data["housenumber"]),
+                escape(address_data["street"])
             )
         else:
             return ''
@@ -467,7 +471,7 @@ class Result:
         data = []
         name = self.properties.get("name")
         if name:
-            data.append("Nom : {}\n".format(self.properties["name"]))
+            data.append("Nom : {}\n".format(escape(name)))
         if self.opening_hours is not None:
             if self.opening_hours.is_open():
                 data.append("<b>Ouvert</b>\n")
@@ -485,7 +489,7 @@ class Result:
                     '<span class="glyphicon glyphicon-phone-alt '
                     'inline-icon" aria-hidden="true"></span>Téléphone : '
                     '<a href="tel:{phone}">{phone}</a>\n'
-                ).format(phone=phone)
+                ).format(phone=escape(phone))
             )
         
         data.append(self.get_address())
