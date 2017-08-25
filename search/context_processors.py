@@ -14,7 +14,7 @@ def get_git_version():
         github_url = "https://github.com/rezemika/goose-search/"
         return {"name": name, "github_url": github_url, "version_url": github_url + "tree/{}".format(commit)}
     except (KeyError, TypeError):
-        return {"name": "", "github_url": github_url, "version_url": ""}
+        return {"name": '', "github_url": '', "version_url": ''}
 
 def meta_processor(request):
     """
