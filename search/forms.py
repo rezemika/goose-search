@@ -50,7 +50,7 @@ class SearchForm(forms.Form):
         required=False, initial=True,
         label="Écarter les résultats à accès privé ?")
     
-    def clean(self):
+    def clean(self, mocking_parameters=None):
         """
             Check that GPS coords or address are given.
         """
@@ -60,25 +60,44 @@ class SearchForm(forms.Form):
         user_address = cleaned_data.get("user_address")
         if not user_latitude or not user_longitude:
             if not user_address:
-                raise forms.ValidationError("Vous devez renseigner"
-                    " vos coordonnées GPS ou votre adresse actuelle.",
-                    code='invalid')
+                raise forms.ValidationError(
+                    "Vous devez renseigner vos coordonnées GPS ou "
+                    "votre adresse actuelle.",
+                    code='invalid'
+                )
+        if all((user_latitude, user_longitude, user_address)):
+            raise forms.ValidationError(
+                "Vous devez renseigner soit vos coordonnées GPS, soit "
+                "votre adresse actuelle (mais pas les deux).",
+                code='invalid'
+            )
+        elif not user_address and not all([user_latitude, user_longitude]):
+            raise forms.ValidationError(
+                "Il manque la latitude ou la longitude dans les "
+                "coordonnées GPS fournies. Vous pouvez alternativement "
+                "fournir une adresse.",
+                code='invalid'
+            )
         attempts = 0
         position = None
         if user_address:
-            position = utils.get_address(address=user_address)
+            position = utils.get_address(
+                address=user_address,
+                mocking_parameters=mocking_parameters
+            )
         else:
             position = utils.get_address(
-                coords=(float(user_latitude), float(user_longitude))
+                coords=(float(user_latitude), float(user_longitude)),
+                mocking_parameters=mocking_parameters
             )
         if position is None:
             raise forms.ValidationError(
-                "L'adresse renseignée n'a pas permis de vous "
+                "Les données renseignées n'ont pas permis de vous "
                 "localiser. Vous pouvez essayer de la "
                 "préciser, par exemple avec un code postal."
             )
         else:
-            cleaned_data["user_latitude"] = position[0][0]
-            cleaned_data["user_longitude"] = position[0][1]
+            cleaned_data["latitude"] = position[0][0]
+            cleaned_data["longitude"] = position[0][1]
             cleaned_data["calculated_address"] = position[1]
         return cleaned_data

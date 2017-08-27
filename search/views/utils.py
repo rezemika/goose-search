@@ -11,6 +11,8 @@ import io
 import logging
 from uuid import uuid4
 from django.utils.html import escape
+from goose import settings
+from search import test_mockers
 
 geolocator = geopy.geocoders.Nominatim(timeout=10)
 debug_logger = logging.getLogger("DEBUG")
@@ -20,6 +22,8 @@ def try_geolocator_reverse(coords):
         Tries many times to get a geolocator object from coordinates,
         or None.
     """
+    if settings.TESTING:
+        return test_mockers.geolocator_object(coords=coords)
     attempts = 0
     while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
         try:
@@ -27,7 +31,6 @@ def try_geolocator_reverse(coords):
                 coords, language="fr"
             )
             return position
-            break
         except geopy.exc.GeopyError as e:
             attempts += 1
             if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
@@ -41,6 +44,8 @@ def try_geolocator_geocode(address):
         Tries many times to get a geolocator object from an address,
         or None.
     """
+    if settings.TESTING:
+        return test_mockers.geolocator_object(address=address)
     attempts = 0
     while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
         try:
@@ -48,7 +53,6 @@ def try_geolocator_geocode(address):
                 address, language="fr"
             )
             return position
-            break
         except geopy.exc.GeopyError as e:
             attempts += 1
             if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
@@ -57,7 +61,7 @@ def try_geolocator_geocode(address):
                 )
                 return None
 
-def get_address(coords=None, address=None, skip_gov_api=False):
+def get_address(coords=None, address=None, skip_gov_api=False, mocking_parameters=None):
     """
         Returns a tuple from a tuple of coordinates or an adress (str).
         
@@ -66,37 +70,46 @@ def get_address(coords=None, address=None, skip_gov_api=False):
         
         Returned tuple : ((lat (float), lon (float)), address (str))
     """
+    if mocking_parameters == "invalid_address":
+        return None
     if (not coords and not address) or (coords and address):
         raise ValueError("One (and only one) of the two params must be given.")
     result = None
     if skip_gov_api is False:
-        if coords:
+        if settings.TESTING:
+            result = test_mockers.gouv_api_address(coords, address)
+        elif coords:
             lat, lon = coords[0], coords[1]
             r = requests.get(
                 "https://api-adresse.data.gouv.fr/reverse",
                 params={'lat': lat, 'lon': lon}
             ).json()
+            result = r.get("features")
         else:
             r = requests.get(
                 "https://api-adresse.data.gouv.fr/search",
                 params={'q': address}
             ).json()
-        result = r.get("features")
+            result = r.get("features")
+    result_is_valid = False
     if result:
         result_lat, result_lon = (
+            # # Gets the first result, cause the API returns
+            # a list of one element.
             result[0]["geometry"]['coordinates'][1],
             result[0]["geometry"]['coordinates'][0]
         )
         # TODO : Improve label.
         result_address = result[0]["properties"]["label"]
-    else:
+        result_is_valid = all((result_lat, result_lon, result_address))
+    if not result or not result_is_valid:
         if coords:
             r = try_geolocator_reverse(coords)
-            if not r:
+            if not r or (r.latitude == r.longitude == 0.0 and r.address == None):
                 return None
         else:
-            r = try_geolocator_geocode(user_address)
-            if not r:
+            r = try_geolocator_geocode(address)
+            if not r or (r.latitude == r.longitude == 0.0 and r.address == None):
                 return None
         result_lat, result_lon = r.latitude, r.longitude
         result_address = r.address.split(',')[:5]

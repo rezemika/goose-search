@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
-import os
+import os, sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,6 +24,8 @@ SECRET_KEY = 'UP)l=+LqM>|#M4Ll\J:I7l3VEB[/SkL9oS&MtNw){`ES<z,UfQ'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
+TESTING = sys.argv[1:2] == ['test']
 
 INTERNAL_IPS = ('127.0.0.1', )
 

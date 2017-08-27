@@ -24,8 +24,8 @@ def home(request):
         form = SearchForm(request.POST)
         if form.is_valid():
             form.clean()
-            user_latitude = form.cleaned_data["user_latitude"]
-            user_longitude = form.cleaned_data["user_longitude"]
+            user_latitude = form.cleaned_data["latitude"]
+            user_longitude = form.cleaned_data["longitude"]
             calculated_address = form.cleaned_data["calculated_address"]
             request.session["search_form"] = {
                 "user_latitude": user_latitude,
@@ -166,8 +166,8 @@ def light_home(request):
         return render(request, "search/geo.html", locals())
     form.clean()
     search_preset = form.cleaned_data["search_preset"]
-    user_latitude = form.cleaned_data["user_latitude"]
-    user_longitude = form.cleaned_data["user_longitude"]
+    user_latitude = form.cleaned_data["latitude"]
+    user_longitude = form.cleaned_data["longitude"]
     user_address = escape(form.cleaned_data["calculated_address"])
     radius = form.cleaned_data["radius"]
     no_private = form.cleaned_data["no_private"]
