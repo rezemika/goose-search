@@ -146,29 +146,34 @@ def get_results(search_preset, user_coords, radius, no_private):
     api = overpass.API()
     response = []
     results = []
+    request = '('
     for line in search_preset.osm_keys.splitlines():
         # Requests both nodes and ways.
-        request = (
-            '(node[{osm_key}](around:{r},{lat},{lon});'
-            'way[{osm_key}](around:{r},{lat},{lon}););'
+        request += (
+            'node[{osm_key}](around:{r},{lat},{lon});'
+            'way[{osm_key}](around:{r},{lat},{lon});'
         ).format(
             osm_key=line, r=radius,
             lat=user_coords[0], lon=user_coords[1]
         )
-        attempts = 0
-        debug_logger.debug("Requesting '{}'".format(line))
-        while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
-            try:
-                response += api.Get(request)['features']
-                debug_logger.debug("Request successfull.")
-                break
-            except overpass.OverpassError as e:
-                attempts += 1
-                if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
-                    debug_logger.debug(
-                        "Error: {}. Raising of 500 error.".format(str(e))
-                    )
-                    raise e
+    request += ');'
+    attempts = 0
+    debug_logger.debug("Requesting '{}'".format(line))
+    while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
+        if settings.TESTING:
+            response = test_mockers.geojsons()
+            break
+        try:
+            response += api.Get(request)['features']
+            debug_logger.debug("Request successfull.")
+            break
+        except overpass.OverpassError as e:
+            attempts += 1
+            if attempts == settings.GOOSE_META["max_geolocation_attempts"]:
+                debug_logger.debug(
+                    "Error: {}. Raising of 500 error.".format(str(e))
+                )
+                raise e
     for element in response:
         if no_private and element["properties"].get("access") in ["private", "no"]:
             continue
