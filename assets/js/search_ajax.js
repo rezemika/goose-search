@@ -53,6 +53,7 @@ function request_results (radius, userLatitude, userLongitude, searchPresetId, n
             $('[data-toggle="popover"]').popover();
             // Loads filters.
             $('#results_filters').html(json.filters);
+            $("<br/>").insertBefore('#results_filters');
             console.log(json.filters);
             console.log('Success !');
         },
