@@ -187,8 +187,6 @@ def light_home(request):
         )
         utils.get_all_addresses(results)
         for result in results:
-            tags_count = utils.get_all_tags(results)
-            tags_filter = utils.render_tag_filter(tags_count, len(results))
             rendered_results.append(str(
                 "<li>" + result.render(
                     render_tags=False, oh_in_popover=False
