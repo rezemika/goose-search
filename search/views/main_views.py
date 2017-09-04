@@ -236,36 +236,123 @@ def light_home(request):
         to avoid a redirection.
     """
     base_template = "base_light.html"
-    if request.method != "POST":
+    get_params = (
+        request.GET.get("sp"),
+        request.GET.get("lat"),
+        request.GET.get("lon"),
+        request.GET.get("radius"),
+        request.GET.get("no_private")
+    )
+    if request.method != "POST" and not all(get_params):
         form = SearchForm()
         return render(request, "search/geo.html", locals())
-    form = SearchForm(request.POST)
+    if not all(get_params):
+        form = SearchForm(request.POST)
+        if not form.is_valid():
+            return render(request, "search/geo.html", locals())
+        form.clean()
     was_limited = getattr(request, 'limited', False)
-    if was_limited:
-        limit_error = (
-            "<center><em>Trop peu de requêtes ont été faites en trop "
-            "peu de temps. Merci d'attendre quelques secondes avant "
-            "de raffraichir la page.</em></center>"
+    errors = []
+    if all(get_params):
+        use_get_params = True
+        get_params_valid = True
+        try:
+            search_preset_id = int(get_params[0])
+            search_preset = SearchPreset.objects.get(id=search_preset_id)
+        except (SearchPreset.DoesNotExist, ValueError):
+            get_params_valid = False
+            errors.append("L'ID de l'objet de votre recherche est invalide.")
+            search_preset_id = 0
+            search_preset = None
+        try:
+            user_latitude = float(get_params[1])
+            user_longitude = float(get_params[2])
+        except ValueError:
+            get_params_valid = False
+            errors.append("Vos coordonnées sont invalides.")
+            user_latitude = 0.0
+            user_longitude = 0.0
+        if settings.TESTING:
+            mocking_parameters = request.GET.get("mocking_parameters")
+        else:
+            mocking_parameters = None
+        user_address = user_address = utils.get_address(
+            coords=(float(user_latitude), float(user_longitude)),
+            mocking_parameters=mocking_parameters
         )
-        return render(request, "search/geo.html", locals())
-    if not form.is_valid():
-        return render(request, "search/geo.html", locals())
-    form.clean()
-    search_preset = form.cleaned_data["search_preset"]
-    user_latitude = form.cleaned_data["latitude"]
-    user_longitude = form.cleaned_data["longitude"]
-    user_address = escape(form.cleaned_data["calculated_address"])
-    radius = form.cleaned_data["radius"]
-    no_private = form.cleaned_data["no_private"]
-    user_coords = (user_latitude, user_longitude)
-    search_description = '"{}" dans un rayon de {} mètres.'.format(search_preset.name, radius)
-    if no_private is True:
-        search_description += " Exclusion des résultats à accès privé."
+        if user_address:
+            user_address = escape(user_address[1])
+        else:
+            user_address = "Adresse inconnue"
+            # Does not set "get_params_valid" to False, because
+            # the address is not useful for searching.
+            errors.append(
+                "Vos coordonnées n'ont pas permis de trouver votre "
+                "adresse actuelle."
+            )
+        try:
+            radius = int(get_params[3])
+            radius_extreme_values = settings.GOOSE_META["radius_extreme_values"]
+            if radius % 10 != 0 or not (
+                radius_extreme_values[0] <= radius <= radius_extreme_values[1]
+            ):
+                raise ValueError
+        except ValueError:
+            get_params_valid = False
+            errors.append("Le rayon de recherche demandé est invalide.")
+            radius = 0
+        no_private = get_params[4] == '1'
     else:
-        search_description += " Inclusion des résultats à accès privé."
+        use_get_params = False
+        get_params_valid = None
+        search_preset = form.cleaned_data["search_preset"]
+        user_latitude = form.cleaned_data["latitude"]
+        user_longitude = form.cleaned_data["longitude"]
+        user_address = escape(form.cleaned_data["calculated_address"])
+        radius = form.cleaned_data["radius"]
+        no_private = form.cleaned_data["no_private"]
+    user_coords = (user_latitude, user_longitude)
+    
+    if search_preset:
+        private_descriptor = {
+            True: "Exclusion",
+            False: "Inclusion"
+        }.get(no_private, False)
+        search_description = (
+            '"{}" dans un rayon de {} mètres. '
+            '{} des résultats à accès privé.'
+        ).format(search_preset.name, radius, private_descriptor)
+    else:
+        search_description = "Paramètres invalides."
+    
+    if was_limited:
+        error.append(
+            "\nTrop peu de requêtes ont été faites en trop peu de temps. "
+            "Merci d'attendre quelques secondes avant de raffraichir la page."
+        )
+    error_msg = '<br/>\n'.join(errors)
+    
+    permalink = request.build_absolute_uri()
+    if not use_get_params:
+        permalink += "?sp={}&lat={}&lon={}&radius={}&no_private={}".format(
+            search_preset_id,
+            user_latitude,
+            user_longitude,
+            radius,
+            {True: '1', False: '0'}.get(no_private, False)
+        )
+    
+    if use_get_params and not get_params_valid:
+        return render(request, "search/light_results.html", {
+            "user_coords": user_coords,
+            "user_address": user_address,
+            "search_description": search_description,
+            "permalink": permalink,
+            "error_msg": error_msg
+        })
+    
     rendered_results = []
-    status = "error"
-    err_msg = ""
+    error_msg = ''
     try:
         results = utils.get_results(
             search_preset, user_coords, radius,
@@ -278,16 +365,15 @@ def light_home(request):
                     render_tags=False, oh_in_popover=False
                 ).replace('\n', '<br/>') + "</li>"
             ))
-        status = "ok"
         debug_logger.debug("Request successfull!")
     except geopy.exc.GeopyError as e:
-        err_msg = "Une erreur s'est produite lors de l'acquisition de vos coordonnées. Vous pouvez essayer de recharger la page dans quelques instants."
+        error_msg = "Une erreur s'est produite lors de l'acquisition de vos coordonnées. Vous pouvez essayer de recharger la page dans quelques instants."
         debug_logger.debug("Geopy error: {}".format(str(e)))
     except overpass.OverpassError as e:
-        err_msg = "Une erreur s'est produite lors de la requête vers les serveurs d'OpenStreetMap. Vous pouvez essayer de recharger la page dans quelques instants."
+        error_msg = "Une erreur s'est produite lors de la requête vers les serveurs d'OpenStreetMap. Vous pouvez essayer de recharger la page dans quelques instants."
         debug_logger.debug("Overpass error: {}".format(str(e)))
     except Exception as e:
-        err_msg = "Une erreur non prise en charge s'est produite."
+        error_msg = "Une erreur non prise en charge s'est produite."
         debug_logger.debug("Unhandled error: {}".format(str(e)))
     # Logs the request to make statistics.
     # Doesn't logs if the request comes from an authenticated user,
@@ -305,9 +391,12 @@ def light_home(request):
         )
     
     return render(request, "search/light_results.html", {
-        "results": rendered_results, "user_coords": user_coords,
-        "user_address": user_address, "search_description": search_description,
-        "status": status, "err_msg": err_msg
+        "results": rendered_results,
+        "user_coords": user_coords,
+        "user_address": user_address,
+        "search_description": search_description,
+        "permalink": permalink,
+        "error_msg": error_msg
     })
 
 def about(request):

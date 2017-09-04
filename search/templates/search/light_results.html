@@ -13,6 +13,9 @@
         </ul>
         <p>Recherche : {{ search_description }}</p>
         <p>Les résultats sont triés par ordre croissant de distance par rapport à votre position. Les liens de guidage sont prévus pour des piétons.</p>
+        {% if not error_msg %}
+        <p>Permalien vers cette recherche : <a href="{{ permalink }}">{{ permalink }}</a></p>
+        {% endif %}
     </div>
     <br/>
     <center><form action="{% url 'home' %}"><input type="submit" value="Nouvelle recherche" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
@@ -20,11 +23,15 @@
     <em>{{ results|length }} résultat{{ results|pluralize }}</em></center>{% endif %}
     <hr>
     <div id="results_list">
-        {% for result in results %}
-            {{ result|safe }}
-        {% empty %}
-            <center><em>Pas de résultats.</em></center>
-        {% endfor %}
+        {% if error_msg %}
+            <center><em>{{ error_msg }}</em></center>
+        {% else %}
+            {% for result in results %}
+                {{ result|safe }}
+            {% empty %}
+                <center><em>Pas de résultats.</em></center>
+            {% endfor %}
+        {% endif %}
     </div>
     <style>
         #content {
