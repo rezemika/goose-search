@@ -1,7 +1,7 @@
 // Requests the results to the server.
 // Thanks to vhf for his precious help for the debug.
 
-function request_results (radius, userLatitude, userLongitude, searchPresetId, no_private) {
+function request_results (radius, userLatitude, userLongitude, searchPresetId, noPrivate) {
     console.log('Starting request...')
     $.ajax({
         url: '/getresults/', // Destination URL.
@@ -11,7 +11,7 @@ function request_results (radius, userLatitude, userLongitude, searchPresetId, n
             user_latitude: userLatitude,
             user_longitude: userLongitude,
             search_preset_id: searchPresetId,
-            no_private: no_private,
+            no_private: noPrivate,
         },
 
         // Handles a successful response.

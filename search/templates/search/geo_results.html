@@ -52,9 +52,9 @@
         var userLongitude = {{ user_coords.1|render_coordinate }};
         var radius = {{ radius }};
         var searchPresetId = {{ search_preset_id }};
-        var no_private = {{ no_private|render_bool_js }};
+        var noPrivate = {{ no_private|render_bool_js }};
         $(document).ready(function() {
-            request_results(radius, userLatitude, userLongitude, searchPresetId, no_private);
+            request_results(radius, userLatitude, userLongitude, searchPresetId, noPrivate);
         });
     </script>
     {% else %}
