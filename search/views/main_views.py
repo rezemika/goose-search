@@ -136,15 +136,7 @@ def results(request):
         )
     error_msg = '<br/>\n'.join(errors)
     
-    permalink = request.build_absolute_uri()
-    if not use_get_params:
-        permalink += "?sp={}&lat={}&lon={}&radius={}&no_private={}".format(
-            search_preset_id,
-            user_latitude,
-            user_longitude,
-            radius,
-            {True: '1', False: '0'}.get(no_private, False)
-        )
+    permalink = utils.get_permalink(request, use_get_params, search_preset_id, user_latitude, user_longitude, radius, no_private)
     return render(request, "search/geo_results.html", {
         "user_coords": (user_latitude, user_longitude),
         "user_address": user_address,
@@ -332,16 +324,7 @@ def light_home(request):
         )
     error_msg = '<br/>\n'.join(errors)
     
-    permalink = request.build_absolute_uri()
-    if not use_get_params:
-        permalink += "?sp={}&lat={}&lon={}&radius={}&no_private={}".format(
-            search_preset.id,
-            user_latitude,
-            user_longitude,
-            radius,
-            {True: '1', False: '0'}.get(no_private, False)
-        )
-    
+    permalink = utils.get_permalink(request, use_get_params, search_preset.id, user_latitude, user_longitude, radius, no_private)
     if use_get_params and not get_params_valid:
         return render(request, "search/light_results.html", {
             "user_coords": user_coords,

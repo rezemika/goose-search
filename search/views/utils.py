@@ -136,6 +136,18 @@ def deg2dir(deg):
     ix = int((deg + 22.5)/45)
     return dirs[ix % 8]
 
+def get_permalink(request, use_get_params, search_preset_id, user_latitude, user_longitude, radius, no_private):
+    permalink = request.build_absolute_uri()
+    if not use_get_params:
+        permalink += "?sp={}&lat={}&lon={}&radius={}&no_private={}".format(
+            search_preset_id,
+            user_latitude,
+            user_longitude,
+            radius,
+            {True: '1', False: '0'}.get(no_private, False)
+        )
+    return permalink
+
 def get_results(search_preset, user_coords, radius, no_private):
     """
         Returns a list of dicts with the properties of all results.
