@@ -1,16 +1,7 @@
 // Requests the results to the server.
 // Thanks to vhf for his precious help for the debug.
 
-function request_results (radius, userLatitude, userLongitude, searchPresetId, no_private, was_limited) {
-    
-    if (was_limited == true) {
-        $('#geo_results').html("<center><em>Trop peu de requêtes ont été faites en trop peu de temps. Merci d'attendre quelques secondes avant de raffraichir la page.</em></center>");
-        $('#geo_results').attr("aria-live", "assertive");
-        $('#geo_results').attr("aria-busy", "false");
-        console.log("Request blocked : too much requests in too little time.");
-        return
-    }
-    
+function request_results (radius, userLatitude, userLongitude, searchPresetId, no_private) {
     console.log('Starting request...')
     $.ajax({
         url: '/getresults/', // Destination URL.

@@ -12,15 +12,20 @@
             <li>Adresse : {{ user_address }}</li>
         </ul>
         <br/>
-        <p>Recherche : {{ search_description }}</p>
+        <p>Recherche : {{ search_description }} {% if use_get_params %}Cette recherche utilise un permalien.{% endif %}</p>
         <br/>
         <p>Les résultats sont triés par ordre croissant de distance par rapport à votre position. Les liens de guidage sont prévus pour des piétons.</p>
+        {% if not error_msg %}
+        <br/>
+        <p>Permalien vers cette recherche : <a href="{{ permalink }}">{{ permalink }}</a></p>
+        {% endif %}
     </div>
     <form action="{% url 'home' %}"><input type="submit" value="Nouvelle recherche" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
     <br/>
     <form id="results_filters">
     </form>
     <hr>
+    {% if not error_msg %}
     <!-- Search Glyphicon from http://glyphicons.com/ -->
     <div id="geo_results" aria-busy="true">
         <div class="sk-circle" id="loading-animation">
@@ -49,10 +54,13 @@
         var radius = {{ radius }};
         var searchPresetId = {{ search_preset_id }};
         var no_private = {{ no_private|render_bool_js }};
-        var was_limited = {{ was_limited|render_bool_js }};
         $(document).ready(function() {
-            request_results(radius, userLatitude, userLongitude, searchPresetId, no_private, was_limited);
+            request_results(radius, userLatitude, userLongitude, searchPresetId, no_private);
         });
     </script>
-    
+    {% else %}
+    <div id="geo_results">
+        <center><em>{{ error_msg|safe }}</em></center>
+    </div>
+    {% endif %}
 {% endblock %}

@@ -6,6 +6,7 @@ from django.utils.html import escape
 from search.models import SearchPreset
 from search.forms import SearchForm
 from ratelimit.decorators import ratelimit
+from goose import settings
 from search.views import utils
 import geopy
 import overpass
@@ -46,28 +47,110 @@ def results(request):
         The page where the results are displayed. Initially empty,
         filled with Ajax and the "geo_get_results" view.
     """
-    if request.session.get("search_form") is None:
+    get_params = (
+        request.GET.get("sp"),
+        request.GET.get("lat"),
+        request.GET.get("lon"),
+        request.GET.get("radius"),
+        request.GET.get("no_private")
+    )
+    if request.session.get("search_form") is None and not all(get_params):
         return redirect("home")
-    was_limited = getattr(request, 'limited', False)
-    search_preset_id = request.session["search_form"]["search_preset_id"]
-    search_preset = SearchPreset.objects.get(id=search_preset_id)
-    user_latitude = request.session["search_form"]["user_latitude"]
-    user_longitude = request.session["search_form"]["user_longitude"]
-    user_address = escape(request.session["search_form"]["user_address"])
-    radius = request.session["search_form"]["radius"]
-    no_private = request.session["search_form"]["no_private"]
-    search_description = '"{}" dans un rayon de {} mètres.'.format(search_preset.name, radius)
-    if no_private is True:
-        search_description += " Exclusion des résultats à accès privé."
+    errors = []
+    if all(get_params):
+        use_get_params = True
+        get_params_valid = True
+        try:
+            search_preset_id = int(get_params[0])
+            search_preset = SearchPreset.objects.get(id=search_preset_id)
+        except (SearchPreset.DoesNotExist, ValueError):
+            get_params_valid = False
+            errors.append("L'ID de l'objet de votre recherche est invalide.")
+            search_preset_id = 0
+            search_preset = None
+        try:
+            user_latitude = float(get_params[1])
+            user_longitude = float(get_params[2])
+        except ValueError:
+            get_params_valid = False
+            errors.append("Vos coordonnées sont invalides.")
+            user_latitude = 0.0
+            user_longitude = 0.0
+        if settings.TESTING:
+            mocking_parameters = request.GET.get("mocking_parameters")
+        else:
+            mocking_parameters = None
+        user_address = user_address = utils.get_address(
+            coords=(float(user_latitude), float(user_longitude)),
+            mocking_parameters=mocking_parameters
+        )
+        if user_address:
+            user_address = escape(user_address[1])
+        else:
+            user_address = "Adresse inconnue"
+            # Does not set "get_params_valid" to False, because
+            # the address is not useful for searching.
+            errors.append(
+                "Vos coordonnées n'ont pas permis de trouver votre "
+                "adresse actuelle."
+            )
+        try:
+            radius = int(get_params[3])
+            if radius % 10 != 0 or not 100 <= radius <= 2000:
+                raise ValueError
+        except ValueError:
+            get_params_valid = False
+            errors.append("Le rayon de recherche demandé est invalide.")
+            radius = 0
+        no_private = get_params[4] == '1'
     else:
-        search_description += " Inclusion des résultats à accès privé."
+        use_get_params = False
+        get_params_valid = None
+        search_preset_id = request.session["search_form"]["search_preset_id"]
+        search_preset = SearchPreset.objects.get(id=search_preset_id)
+        user_latitude = request.session["search_form"]["user_latitude"]
+        user_longitude = request.session["search_form"]["user_longitude"]
+        user_address = escape(request.session["search_form"]["user_address"])
+        radius = request.session["search_form"]["radius"]
+        no_private = request.session["search_form"]["no_private"]
+    if search_preset:
+        private_descriptor = {
+            True: "Exclusion",
+            False: "Inclusion"
+        }.get(no_private, False)
+        search_description = (
+            '"{}" dans un rayon de {} mètres. '
+            '{} des résultats à accès privé.'
+        ).format(search_preset.name, radius, private_descriptor)
+    else:
+        search_description = "Paramètres invalides."
+    
+    was_limited = getattr(request, 'limited', False)
+    if was_limited:
+        error.append(
+            "\nTrop peu de requêtes ont été faites en trop peu de temps. "
+            "Merci d'attendre quelques secondes avant de raffraichir la page."
+        )
+    error_msg = '<br/>\n'.join(errors)
+    
+    permalink = request.build_absolute_uri()
+    if not use_get_params:
+        permalink += "?sp={}&lat={}&lon={}&radius={}&no_private={}".format(
+            search_preset_id,
+            user_latitude,
+            user_longitude,
+            radius,
+            {True: '1', False: '0'}.get(no_private, False)
+        )
     return render(request, "search/geo_results.html", {
         "user_coords": (user_latitude, user_longitude),
         "user_address": user_address,
         "radius": radius,
         "search_preset_id": search_preset_id,
         "no_private": no_private,
-        "was_limited": was_limited,
+        "use_get_params": use_get_params,
+        "error_msg": error_msg,
+        "permalink": permalink,
         "search_description": search_description
         }
     )
