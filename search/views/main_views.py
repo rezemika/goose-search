@@ -130,7 +130,7 @@ def results(request):
     
     was_limited = getattr(request, 'limited', False)
     if was_limited:
-        error.append(
+        errors.append(
             "\nTrop peu de requêtes ont été faites en trop peu de temps. "
             "Merci d'attendre quelques secondes avant de raffraichir la page."
         )
@@ -335,7 +335,7 @@ def light_home(request):
     permalink = request.build_absolute_uri()
     if not use_get_params:
         permalink += "?sp={}&lat={}&lon={}&radius={}&no_private={}".format(
-            search_preset_id,
+            search_preset.id,
             user_latitude,
             user_longitude,
             radius,
