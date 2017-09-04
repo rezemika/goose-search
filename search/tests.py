@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from search.models import SearchPreset
 from search.forms import SearchForm
 from django.contrib.auth.models import User
+from django.utils.html import escape
 from search.views import utils
 
 class UtilsTest(TestCase):
@@ -441,4 +442,255 @@ class SearchFormTest(TestCase):
         self.assertEqual(session["search_form"]["radius"], 500)
         self.assertEqual(session["search_form"]["search_preset_id"], self.search_preset_id)
         self.assertEqual(session["search_form"]["no_private"], True)
+        return
+
+class PermalinkTest(TestCase):
+    """
+        Tests the functioning of permalinks.
+    """
+    def setUp(self):
+        search_preset = SearchPreset(
+            name="Boulangerie / Pâtisserie",
+            osm_keys='"shop"="bakery"\n"shop"="pastry"',
+            processing_rules='"fee" "Payant":["yes":"Oui"|"no":"Non"]'
+        )
+        search_preset.save()
+        self.search_preset_id = search_preset.id
+        return
+    
+    def escape_request_uri(self, response):
+        return bytes(escape(response.wsgi_request.build_absolute_uri()), encoding='utf-8')
+    
+    def test_normal_valid_permalinks(self):
+        get_data = {
+            "sp": self.search_preset_id,
+            "lat": "64.14624",
+            "lon": "-21.94259",
+            "radius": "500",
+            "no_private": "1"
+        }
+        response = self.client.get('/results/', get_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "<center><em>")
+        self.assertContains(response, self.escape_request_uri(response))
+        self.assertContains(response, "Latitude : 64.14624")
+        self.assertContains(response, "Longitude : -21.94259")
+        self.assertContains(
+            response, 'Recherche : &quot;Boulangerie / Pâtisserie&quot;'
+        )
+        self.assertContains(response, " dans un rayon de 500 mètres.")
+        self.assertContains(response, "Exclusion des résultats à accès privé.")
+        
+        # Same test, but including private results.
+        get_data = {
+            "sp": self.search_preset_id,
+            "lat": "64.14624",
+            "lon": "-21.94259",
+            "radius": "500",
+            "no_private": "0"
+        }
+        response = self.client.get('/results/', get_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "<center><em>")
+        self.assertContains(response, self.escape_request_uri(response))
+        self.assertContains(response, "Latitude : 64.14624")
+        self.assertContains(response, "Longitude : -21.94259")
+        self.assertContains(
+            response, 'Recherche : &quot;Boulangerie / Pâtisserie&quot;'
+        )
+        self.assertContains(response, " dans un rayon de 500 mètres.")
+        self.assertContains(response, "Inclusion des résultats à accès privé.")
+        return
+    
+    def test_normal_invalid_permalinks(self):
+        # Invalid search preset.
+        get_data = {
+            "sp": "9999",
+            "lat": "64.14624",
+            "lon": "-21.94259",
+            "radius": "500",
+            "no_private": "1"
+        }
+        response = self.client.get('/results/', get_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<center><em>L&#39;ID de l&#39;objet de votre recherche est invalide.</em></center>")
+        self.assertNotContains(response, self.escape_request_uri(response))
+        self.assertContains(response, "Latitude : 64.14624")
+        self.assertContains(response, "Longitude : -21.94259")
+        self.assertContains(response, 'Recherche : Paramètres invalides.')
+        # Invalid radius.
+        get_data = {
+            "sp": self.search_preset_id,
+            "lat": "64.14624",
+            "lon": "-21.94259",
+            "radius": "azerty",
+            "no_private": "1"
+        }
+        response = self.client.get('/results/', get_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<center><em>Le rayon de recherche demandé est invalide.</em></center>")
+        self.assertNotContains(response, self.escape_request_uri(response))
+        self.assertContains(response, "Latitude : 64.14624")
+        self.assertContains(response, "Longitude : -21.94259")
+        self.assertContains(response, 'Recherche : &quot;Boulangerie / Pâtisserie&quot;')
+        self.assertContains(response, " dans un rayon de 0 mètres.")
+        # Invalid radius (again).
+        get_data = {
+            "sp": self.search_preset_id,
+            "lat": "64.14624",
+            "lon": "-21.94259",
+            "radius": "5",
+            "no_private": "1"
+        }
+        response = self.client.get('/results/', get_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<center><em>Le rayon de recherche demandé est invalide.</em></center>")
+        self.assertNotContains(response, self.escape_request_uri(response))
+        self.assertContains(response, "Latitude : 64.14624")
+        self.assertContains(response, "Longitude : -21.94259")
+        self.assertContains(response, 'Recherche : &quot;Boulangerie / Pâtisserie&quot;')
+        self.assertContains(response, " dans un rayon de 0 mètres.")
+        # Invalid coordinates.
+        get_data = {
+            "sp": self.search_preset_id,
+            "lat": "azerty",
+            "lon": "qwerty",
+            "radius": "500",
+            "no_private": "1"
+        }
+        response = self.client.get('/results/', get_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<center><em>Vos coordonnées sont invalides.</em></center>")
+        self.assertNotContains(response, self.escape_request_uri(response))
+        self.assertContains(response, "Latitude : 0.0")
+        self.assertContains(response, "Longitude : 0.0")
+        self.assertContains(response, 'Recherche : &quot;Boulangerie / Pâtisserie&quot;')
+        self.assertContains(response, " dans un rayon de 500 mètres.")
+        # Missing parameter.
+        get_data = {
+            "sp": self.search_preset_id,
+            "lat": "64.14624",
+            "lon": "-21.94259",
+            "radius": "500"
+        }
+        response = self.client.get('/results/', get_data)
+        self.assertRedirects(response, '/')
+        return
+    
+    def test_light_valid_permalinks(self):
+        get_data = {
+            "sp": self.search_preset_id,
+            "lat": "64.14624",
+            "lon": "-21.94259",
+            "radius": "500",
+            "no_private": "1"
+        }
+        response = self.client.get('/light/', get_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "<center><em>")
+        self.assertContains(response, self.escape_request_uri(response))
+        self.assertContains(response, "Latitude : 64.14624")
+        self.assertContains(response, "Longitude : -21.94259")
+        self.assertContains(
+            response, 'Recherche : &quot;Boulangerie / Pâtisserie&quot;'
+        )
+        self.assertContains(response, " dans un rayon de 500 mètres.")
+        self.assertContains(response, "Exclusion des résultats à accès privé.")
+        self.assertContains(response, "Nom : City Hall of Reykjavik")
+        
+        # Same test, but including private results.
+        get_data = {
+            "sp": self.search_preset_id,
+            "lat": "64.14624",
+            "lon": "-21.94259",
+            "radius": "500",
+            "no_private": "0"
+        }
+        response = self.client.get('/light/', get_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "<center><em>")
+        self.assertContains(response, self.escape_request_uri(response))
+        self.assertContains(response, "Latitude : 64.14624")
+        self.assertContains(response, "Longitude : -21.94259")
+        self.assertContains(
+            response, 'Recherche : &quot;Boulangerie / Pâtisserie&quot;'
+        )
+        self.assertContains(response, " dans un rayon de 500 mètres.")
+        self.assertContains(response, "Inclusion des résultats à accès privé.")
+        self.assertContains(response, "Nom : City Hall of Reykjavik")
+        return
+    
+    def test_light_invalid_permalinks(self):
+        # Invalid search preset.
+        get_data = {
+            "sp": "9999",
+            "lat": "64.14624",
+            "lon": "-21.94259",
+            "radius": "500",
+            "no_private": "1"
+        }
+        response = self.client.get('/results/', get_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<center><em>L&#39;ID de l&#39;objet de votre recherche est invalide.</em></center>")
+        self.assertNotContains(response, self.escape_request_uri(response))
+        self.assertContains(response, "Latitude : 64.14624")
+        self.assertContains(response, "Longitude : -21.94259")
+        self.assertContains(response, 'Recherche : Paramètres invalides.')
+        # Invalid radius.
+        get_data = {
+            "sp": self.search_preset_id,
+            "lat": "64.14624",
+            "lon": "-21.94259",
+            "radius": "azerty",
+            "no_private": "1"
+        }
+        response = self.client.get('/results/', get_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<center><em>Le rayon de recherche demandé est invalide.</em></center>")
+        self.assertNotContains(response, self.escape_request_uri(response))
+        self.assertContains(response, "Latitude : 64.14624")
+        self.assertContains(response, "Longitude : -21.94259")
+        self.assertContains(response, 'Recherche : &quot;Boulangerie / Pâtisserie&quot;')
+        self.assertContains(response, " dans un rayon de 0 mètres.")
+        # Invalid radius (again).
+        get_data = {
+            "sp": self.search_preset_id,
+            "lat": "64.14624",
+            "lon": "-21.94259",
+            "radius": "5",
+            "no_private": "1"
+        }
+        response = self.client.get('/results/', get_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<center><em>Le rayon de recherche demandé est invalide.</em></center>")
+        self.assertNotContains(response, self.escape_request_uri(response))
+        self.assertContains(response, "Latitude : 64.14624")
+        self.assertContains(response, "Longitude : -21.94259")
+        self.assertContains(response, 'Recherche : &quot;Boulangerie / Pâtisserie&quot;')
+        self.assertContains(response, " dans un rayon de 0 mètres.")
+        # Invalid coordinates.
+        get_data = {
+            "sp": self.search_preset_id,
+            "lat": "azerty",
+            "lon": "qwerty",
+            "radius": "500",
+            "no_private": "1"
+        }
+        response = self.client.get('/results/', get_data)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<center><em>Vos coordonnées sont invalides.</em></center>")
+        self.assertNotContains(response, self.escape_request_uri(response))
+        self.assertContains(response, "Latitude : 0.0")
+        self.assertContains(response, "Longitude : 0.0")
+        self.assertContains(response, 'Recherche : &quot;Boulangerie / Pâtisserie&quot;')
+        self.assertContains(response, " dans un rayon de 500 mètres.")
+        # Missing parameter.
+        get_data = {
+            "sp": self.search_preset_id,
+            "lat": "64.14624",
+            "lon": "-21.94259",
+            "radius": "500"
+        }
+        response = self.client.get('/light/', get_data)
+        self.assertNotContains(response, "Résultats de la recherche")
         return
