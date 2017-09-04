@@ -250,6 +250,53 @@ def get_all_tags(results):
                 tags_count[tag] = 1
     return tags_count
 
+def parse_csv_data(result, csv_line, address_data):
+    """
+        Parses a line of the CSV obtained by
+        the function 'get_all_addresses'.
+    """
+    # Checks address_data contains at least one information,
+    # and / including the street name.
+    if all(address_data):
+        debug_logger.debug(
+            "The address from '{}' is full (OSM_ID: {}).".format(
+                csv_line,
+                result.osm_meta[1]
+            )
+        )
+        address = "Adresse estimée : {housenumber} {street}, {postcode} {city}".format(
+            housenumber=address_data[0],
+            street=address_data[1],
+            postcode=address_data[2],
+            city=address_data[3]
+        )
+    elif address_data[0] and address_data[1]:
+        debug_logger.debug(
+            "The address from '{}' is usable (but not full) (OSM_ID: {}).".format(
+                csv_line,
+                result.osm_meta[1]
+            )
+        )
+        address = "Adresse estimée : {housenumber} {street}".format(
+            housenumber=address_data[0],
+            street=address_data[1]
+        )
+    else:  # If the address is not in France (or in case of error).
+        debug_logger.debug(
+            "One or more informations are missing for the address '{}' (OSM_ID: {}).".format(
+                csv_line,
+                result.osm_meta[1]
+            )
+        )
+        address = get_address(
+            coords=(result.coordinates[0], result.coordinates[1]),
+            skip_gov_api=True
+        )[1]
+        if not address:
+            return ''
+        address = "Adresse estimée : {}".format(address)
+    return address
+
 def get_all_addresses(results):
     """
         Fills the addresses of the given results (list).
@@ -268,23 +315,30 @@ def get_all_addresses(results):
             csv += str(result.coordinates[0]) + ',' + str(result.coordinates[1]) + ',' + result.uuid + '\n'
     debug_logger.debug("CSV created.")
     debug_logger.debug("Content:\n" + csv)
-    fake_file = io.StringIO(csv)
-    files = {'file': fake_file}
-    r = requests.post(
-        "https://api-adresse.data.gouv.fr/reverse/csv/",
-        files={'data': fake_file}
-    )
-    debug_logger.debug(
-        "Request sent. API returned {} status code. URL: {}".format(
-            r.status_code, r.url
+    if settings.TESTING:
+        csv_returned = test_mockers.gouv_api_csv(csv)
+        debug_logger.debug("Mocker returned CSV.")
+        debug_logger.debug('\n' + csv_returned)
+        csv_returned = csv_returned.splitlines()
+    else:
+        fake_file = io.StringIO(csv)
+        files = {'file': fake_file}
+        r = requests.post(
+            "https://api-adresse.data.gouv.fr/reverse/csv/",
+            files={'data': fake_file}
         )
-    )
-    debug_logger.debug('\n' + r.text)
-    for csv_line in r.text.splitlines()[1:]:
+        debug_logger.debug(
+            "Request sent. API returned {} status code. URL: {}".format(
+                r.status_code, r.url
+            )
+        )
+        debug_logger.debug('\n' + r.text)
+        csv_returned = r.text.splitlines()[1:]
+    for csv_line in csv_returned:
         parsed_line = csv_line.split(',')
-        current_uuid = str(parsed_line[2])
+        current_uuid = parsed_line[2]
         for result in results:
-            if result.uuid != current_uuid:
+            if str(result.uuid) != str(current_uuid):
                 continue
             address_data = [
                 parsed_line[9],
@@ -292,47 +346,7 @@ def get_all_addresses(results):
                 parsed_line[12],
                 parsed_line[13]
             ]
-            # Checks address_data contains at least one information,
-            # and / including the street name.
-            if any(address_data) and address_data[1]:
-                debug_logger.debug(
-                    "The address from '{}' is correct (OSM_ID: {}).".format(
-                        csv_line,
-                        result.osm_meta[1]
-                    )
-                )
-                address = "Adresse estimée : {housenumber} {street}, {postcode} {city}".format(
-                    housenumber=address_data[0],
-                    street=address_data[1],
-                    postcode=address_data[2],
-                    city=address_data[3]
-                )
-            else:  # If the address is not in France (or in case of error).
-                debug_logger.debug(
-                    "One or more informations are missing for the address '{}' (OSM_ID: {}).".format(
-                        csv_line,
-                        result.osm_meta[1]
-                    )
-                )
-                address = get_address(
-                    coords=(result.coordinates[0], result.coordinates[1]),
-                    skip_gov_api=True
-                )
-                if not address:
-                    debug_logger.error(
-                        "The address of result could not be obtained. (OSM_ID: {}).".format(
-                            result.osm_meta[1]
-                        )
-                    )
-                else:
-                    address = address[1]
-                    address = "Adresse estimée : {housenumber} {street}, {postcode} {city}".format(
-                        housenumber=address[0],
-                        street=address[1],
-                        postcode=address[2],
-                        city=address[3]
-                    )
-            result.string_address = address
+            result.string_address = parse_csv_data(result, csv_line, address_data)
     debug_logger.debug("Address getting finished successfully.")
     return
 
