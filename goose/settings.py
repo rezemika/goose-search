@@ -228,6 +228,7 @@ GOOSE_META = {
         "OpenStreetMap pour chercher des points d'intérêt à proximité."
     ),
     "max_geolocation_attempts": 3,
+    "radius_extreme_values": [100, 2000],
 }
 
 

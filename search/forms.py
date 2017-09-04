@@ -36,7 +36,9 @@ class SearchForm(forms.Form):
     radius = forms.IntegerField(
         label="Rayon de recherche",
         help_text="en mètres",
-        min_value=100, max_value=2000, initial=500,
+        min_value=settings.GOOSE_META["radius_extreme_values"][0],
+        max_value=settings.GOOSE_META["radius_extreme_values"][1],
+        initial=500,
         widget=forms.NumberInput(attrs={
             "class": "form-control", "step": 50
         })

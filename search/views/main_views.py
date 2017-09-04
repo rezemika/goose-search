@@ -96,7 +96,10 @@ def results(request):
             )
         try:
             radius = int(get_params[3])
-            if radius % 10 != 0 or not 100 <= radius <= 2000:
+            radius_extreme_values = settings.GOOSE_META["radius_extreme_values"]
+            if radius % 10 != 0 or not (
+                radius_extreme_values[0] <= radius <= radius_extreme_values[1]
+            ):
                 raise ValueError
         except ValueError:
             get_params_valid = False
