@@ -110,15 +110,15 @@ def get_results(request):
     except geopy.exc.GeopyError as e:
         err_msg = "Une erreur s'est produite lors de l'acquisition de vos coordonnées. Vous pouvez essayer de recharger la page dans quelques instants."
         debug_msg = str(e)
-        debug_logger.debug("Geopy error: {exception}".format(str(e)))
+        debug_logger.debug("Geopy error: {}".format(str(e)))
     except overpass.OverpassError as e:
         err_msg = "Une erreur s'est produite lors de la requête vers les serveurs d'OpenStreetMap. Vous pouvez essayer de recharger la page dans quelques instants."
         debug_msg = str(e)
-        debug_logger.debug("Overpass error: {exception}".format(str(e)))
+        debug_logger.debug("Overpass error: {}".format(str(e)))
     except Exception as e:
         err_msg = "Une erreur non prise en charge s'est produite."
         debug_msg = str(e)
-        debug_logger.debug("Unhandled error: {exception}".format(str(e)))
+        debug_logger.debug("Unhandled error: {}".format(str(e)))
     # Logs the request to make statistics.
     # Doesn't logs if the request comes from an authenticated user,
     # as it is probably an admin.
@@ -196,13 +196,13 @@ def light_home(request):
         debug_logger.debug("Request successfull!")
     except geopy.exc.GeopyError as e:
         err_msg = "Une erreur s'est produite lors de l'acquisition de vos coordonnées. Vous pouvez essayer de recharger la page dans quelques instants."
-        debug_logger.debug("Geopy error: {exception}".format(str(e)))
+        debug_logger.debug("Geopy error: {}".format(str(e)))
     except overpass.OverpassError as e:
         err_msg = "Une erreur s'est produite lors de la requête vers les serveurs d'OpenStreetMap. Vous pouvez essayer de recharger la page dans quelques instants."
-        debug_logger.debug("Overpass error: {exception}".format(str(e)))
+        debug_logger.debug("Overpass error: {}".format(str(e)))
     except Exception as e:
         err_msg = "Une erreur non prise en charge s'est produite."
-        debug_logger.debug("Unhandled error: {exception}".format(str(e)))
+        debug_logger.debug("Unhandled error: {}".format(str(e)))
     # Logs the request to make statistics.
     # Doesn't logs if the request comes from an authenticated user,
     # as it is probably an admin.
@@ -210,7 +210,7 @@ def light_home(request):
         logger = logging.getLogger("statistics")
         logger.info(
             "search:{id}:{radius}:{lat}:{lon}".format(
-                id=search_preset_id,
+                id=search_preset.id,
                 radius=radius,
                 # Rounds the stored coordinates for privacy's sake.
                 lat=round(user_latitude),
