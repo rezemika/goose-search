@@ -60,14 +60,20 @@ class SearchPreset(models.Model):
         
         If processing_rules is blank, only address is displayed.
     """
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, verbose_name="Nom")
     osm_keys = models.TextField(
-        blank=True, null=True, validators=[osm_keys_validator]
+        blank=True, null=True, validators=[osm_keys_validator],
+        verbose_name="Clés OpenStreetMap"
     )
     processing_rules = models.TextField(
         blank=True, null=True,
-        validators=[preset_pr_validator]
+        validators=[preset_pr_validator],
+        verbose_name="Règles de traitement"
     )
+    
+    class Meta:
+        verbose_name = "Point d'intérêt"
+        verbose_name_plural = "Points d'intérêt"
     
     def render_pr(self, properties):
         """
