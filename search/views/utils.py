@@ -215,7 +215,7 @@ def render_tag_filter(tags, count):
         </div>
     </div>
     """
-    output = ""
+    output = ''
     # TODO : Make it cleaner.
     tag_names = OrderedDict()
     tag_names["open"] = "Ouvert"
@@ -384,7 +384,7 @@ class Result:
         self.search_preset = search_preset
         self.properties = geojson["properties"]
         self.default_address = self.get_default_address()
-        self.string_address = ""
+        self.string_address = ''
         self.distance = round(distance.vincenty(
             (user_coordinates[0], user_coordinates[1]), self.coordinates
         ).m)
@@ -511,7 +511,7 @@ class Result:
             a result and its properties.
         """
         html = '<div role="article" class="result-box">{}</div>'
-        content = ""
+        content = ''
         data = []
         name = self.properties.get("name")
         if name:

@@ -170,9 +170,9 @@ def get_results(request):
         no_private = False
     rendered_results = []
     status = "error"
-    err_msg = ""
-    debug_msg = ""
-    tags_filter = ""
+    err_msg = ''
+    debug_msg = ''
+    tags_filter = ''
     try:
         results = utils.get_results(
             search_preset, (user_latitude, user_longitude), radius,
