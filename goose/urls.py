@@ -33,3 +33,6 @@ if settings.DEBUG:
     urlpatterns = [
         url(r'^__debug__/', include(debug_toolbar.urls)),
     ] + urlpatterns
+
+handler404 = "search.views.main_views.handler404"
+handler500 = "search.views.main_views.handler500"
