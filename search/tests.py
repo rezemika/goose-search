@@ -134,7 +134,8 @@ class ViewsTest(TestCase):
         self.assertContains(response, "var searchPresetId = {};".format(
             self.search_preset_id)
         )
-        self.assertContains(response, "var no_private = true;")
+        print(response.content)
+        self.assertContains(response, "var noPrivate = true;")
         return
     
     def test_results_page(self):
