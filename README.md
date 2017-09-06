@@ -12,11 +12,7 @@ Ce dépôt utilise [le "cactus model"](https://barro.github.io/2016/02/a-succesf
 - Chargement des résultats avec Ajax
 - Affichage des propriétés des résultat modifiable selon la recherche effectuée
 - Version ultralégère (Goose Light), proposant des pages épurées (environ 25Ko pour 15 résultats)
-
-# TODO
-
-- Recherche avancée avec tags personnalisés
-- Tests unitaires
+- Permaliens de recherche, permettant refaire une même recherche sans re-remplir le formulaire
 
 # Licence
 
