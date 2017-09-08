@@ -391,7 +391,7 @@ class Result:
         self.bearing = get_bearing(user_coordinates, self.coordinates)
         self.direction = deg2dir(self.bearing)
         # TODO : Make it independent to timezones ?
-        oh_field = escape(self.properties.get("opening_hours"))
+        oh_field = self.properties.get("opening_hours")
         self.opening_hours = None
         if oh_field:
             try:
