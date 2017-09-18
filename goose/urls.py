@@ -11,7 +11,8 @@ urlpatterns = [
     url(r'^about/$', views.about, name='about'),
     url(r'^light/$', views.light_home, name='light'),
     url(r'^light/about/$', views.about, name='light-about'),
-    url(r'^admin/', admin.site.urls)
+    url(r'^admin/', admin.site.urls),
+    url(r'^i18n/', include('django.conf.urls.i18n'))
 ]
 
 if settings.DEBUG:

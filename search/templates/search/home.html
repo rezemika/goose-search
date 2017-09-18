@@ -1,9 +1,10 @@
 {% extends base_template %}
 {% load static %}
+{% load i18n %}
 {% block content %}
     <h1>Goose <small>Offers an Openstreetmap Search Engine</small></h1>
     <br/>
-    <div class="alert alert-info" role="complementary">Goose est un outil de recherche géographique. Vous pouvez entrer vos coordonnées GPS avec le bouton "Me localiser" ou entrer une adresse. Choisissez le sujet de votre recherche, le rayon (en mètres) et cliquez sur "Envoyer". La requête peut prendre un certain temps.</div>
+    <div class="alert alert-info light-box" role="complementary">{% blocktrans %}Goose est un outil de recherche géographique. Vous pouvez entrer vos coordonnées GPS avec le bouton "Me localiser" ou entrer une adresse. Choisissez le sujet de votre recherche, le rayon (en mètres) et cliquez sur "Envoyer". La requête peut prendre un certain temps.{% endblocktrans %}</div>
     <br/>
     <noscript>
         <div class="alert alert-danger" role="alert">La recherche classique de Goose nécessite Javascript pour fonctionner correctement. Activez-le dans votre navigateur, ou utilisez <a href="{% url 'light' %}">Goose Light</a> pour faire une recherche sans Javascript.</div>
@@ -11,13 +12,48 @@
     </noscript>
     <form method="post" action="" id="geoform">
         <div role="search">
-            {{ limit_error|safe }}
+            {{ limit_error|safe }} {# TODO : Check usefulness. #}
             {% csrf_token %}
             {{ form.as_p }}
-            <input type="button" id="localisation-btn" value="Me localiser" onclick="getLocationConstant()" class="btn btn-secondary btn-mobile btn-sharp btn-gray"/>
-            <input type="submit" id="submit-btn" value="Envoyer" class="btn btn-primary btn-mobile btn-sharp"/>
+            <input type="button" id="localisation-btn" value="{% trans 'Me localiser' %}" onclick="getLocationConstant()" class="btn btn-secondary btn-mobile btn-sharp btn-gray"/>
+            <input type="submit" id="submit-btn" value="{% trans 'Envoyer' %}" class="btn btn-primary btn-mobile btn-sharp"/>
         </div>
     </form>
-    <br/>
+    {% if "light" in base_template %}
+    <style>
+        .light-box {
+            margin-bottom: 0.5em;
+            border: solid 1px;
+            border-color: grey;
+            border-radius: 1em;
+            //width: 90%;
+            padding: 0.5em;
+        }
+        em {
+            font-weight: bold;
+            font-size: 110%;
+        }
+    </style>
+    {% endif %}
     <script type="text/javascript" src="{% static 'js/geolocation_form.js' %}"></script>
+    {% if "light" in base_template %}
+        <div class="smallbox" role="complementary">
+            <h2>{% blocktrans %}Langue{% endblocktrans %}</h2>
+            {% get_current_language as LANGUAGE_CODE %}
+            {% get_available_languages as LANGUAGES %}
+            {% get_language_info_list for LANGUAGES as languages %}
+            <ul>
+                {% for language in languages %}
+                <li>
+                    <form action="{% url 'set_language' %}" method="post" id="form_{{ language.code }}" onclick="this.submit();" style="cursor:pointer;">
+                        {% csrf_token %}
+                        <input name="next" type="hidden" value="{{ request.path }}"/>
+                        <input name="language" type="hidden" value="{{ language.code }}"/>
+                        <button type="submit" form="form_{{ language.code }}">{{ language.name_local|title }} ({{ language.code }})</button>
+                    </form>
+                </li><br/>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 {% endblock %}

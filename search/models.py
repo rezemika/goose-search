@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils.translation import ugettext_lazy as _
 import re
 
 # TODO : Allow spaces in patterns (["v1":"DV1" | "v2":"DV2"])
@@ -28,19 +29,19 @@ def preset_pr_validator(preset):
                 i += 1
                 continue
             else:
-                raise ValidationError("Erreur ligne {}. Le label et la clé doivent être entourés de guillemets (\") et séparés par deux points (:)".format(i))
+                raise ValidationError(_("Erreur ligne {}. Le label et la clé doivent être entourés de guillemets (\") et séparés par deux points (:)").format(i))
         elif not re.match('"\w+" ".*":\[".*":".*"(\|".*":".*")*\]', line):
-            raise ValidationError("Erreur ligne {}. Cette ligne ne correspond à aucun pattern valable".format(i))
+            raise ValidationError(_("Erreur ligne {}. Cette ligne ne correspond à aucun pattern valable").format(i))
         
         try:
             key = line.split()[0]
             action = line.split(' ', 1)[1]
         except IndexError:
-            raise ValidationError("Erreur ligne {}. La clé et l'action doivent être séparés par une espace.".format(i))
+            raise ValidationError(_("Erreur ligne {}. La clé et l'action doivent être séparés par une espace.").format(i))
         if not re.search('".*"', key):
-            raise ValidationError("Erreur ligne {}. La clé est invalide.".format(i))
+            raise ValidationError(_("Erreur ligne {}. La clé est invalide.").format(i))
         if not re.search('".*":\["\w+":".*"(\|"\w+":".*")*\]', action):
-            raise ValidationError("Erreur ligne {}. L'action est invalide.".format(i))
+            raise ValidationError(_("Erreur ligne {}. L'action est invalide.").format(i))
         i += 1
     return
 
@@ -50,7 +51,7 @@ def osm_keys_validator(field):
         if re.match('"\w+"="\w+"', line):
             continue
         else:
-            raise ValidationError('Erreur ligne {}. Chaque ligne doit être de la forme \'"key"="value"\'.'.format(i))
+            raise ValidationError(_('Erreur ligne {}. Chaque ligne doit être de la forme \'"key"="value"\'.').format(i))
         i += 1
     return
 
@@ -113,12 +114,12 @@ class SearchPreset(models.Model):
     name = models.CharField(max_length=50, verbose_name="Nom")
     osm_keys = models.TextField(
         blank=True, null=True, validators=[osm_keys_validator],
-        verbose_name="Clés OpenStreetMap"
+        verbose_name=_("Clés OpenStreetMap")
     )
     processing_rules = models.TextField(
         blank=True, null=True,
         validators=[preset_pr_validator],
-        verbose_name="Règles de traitement"
+        verbose_name=_("Règles de traitement")
     )
     filters = models.ManyToManyField(
         Filter,
@@ -126,8 +127,8 @@ class SearchPreset(models.Model):
     )
     
     class Meta:
-        verbose_name = "Point d'intérêt"
-        verbose_name_plural = "Points d'intérêt"
+        verbose_name = _("Point d'intérêt")
+        verbose_name_plural = _("Points d'intérêt")
     
     def render_pr(self, properties):
         """

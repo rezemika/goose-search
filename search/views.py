@@ -1,9 +1,10 @@
 from django.shortcuts import render
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.template.loader import render_to_string
 from django.utils.html import escape
+from django.utils.translation import ugettext as _
 from search.models import SearchPreset
 from search.forms import SearchForm
 from ratelimit.decorators import ratelimit
@@ -67,7 +68,7 @@ def results(request):
             search_preset = SearchPreset.objects.get(id=search_preset_id)
         except (SearchPreset.DoesNotExist, ValueError):
             get_params_valid = False
-            errors.append("L'ID de l'objet de votre recherche est invalide.")
+            errors.append(_("L'ID de l'objet de votre recherche est invalide."))
             search_preset_id = 0
             search_preset = None
         try:
@@ -75,7 +76,7 @@ def results(request):
             user_longitude = float(get_params[2])
         except ValueError:
             get_params_valid = False
-            errors.append("Vos coordonnées sont invalides.")
+            errors.append(_("Vos coordonnées sont invalides."))
             user_latitude = 0.0
             user_longitude = 0.0
         if settings.TESTING:
@@ -89,14 +90,14 @@ def results(request):
         if user_address:
             user_address = escape(user_address[1])
         else:
-            user_address = "Adresse inconnue"
+            user_address = _("Adresse inconnue")
             # Does not set "get_params_valid" to False, because
             # the address is not useful for searching.
             # TODO : Don't append error?
-            errors.append(
+            errors.append(_(
                 "Vos coordonnées n'ont pas permis de trouver votre "
                 "adresse actuelle."
-            )
+            ))
         try:
             radius = int(get_params[3])
             radius_extreme_values = settings.GOOSE_META["radius_extreme_values"]
@@ -106,7 +107,7 @@ def results(request):
                 raise ValueError
         except ValueError:
             get_params_valid = False
-            errors.append("Le rayon de recherche demandé est invalide.")
+            errors.append(_("Le rayon de recherche demandé est invalide."))
             radius = 0
         no_private = get_params[4] == '1'
     else:
@@ -120,23 +121,28 @@ def results(request):
         radius = request.session["search_form"]["radius"]
         no_private = request.session["search_form"]["no_private"]
     if search_preset:
-        private_descriptor = {
-            True: "Exclusion",
-            False: "Inclusion"
-        }.get(no_private, False)
-        search_description = (
-            '"{}" dans un rayon de {} mètres. '
-            '{} des résultats à accès privé.'
-        ).format(search_preset.name, radius, private_descriptor)
+        if no_private:
+            search_description = (_(
+                '"{search_preset}" dans un rayon de {radius} mètres. '
+                'Exclusion des résultats à accès privé.'
+            ))
+        else:
+            search_description = (_(
+                '"{search_preset}" dans un rayon de {radius} mètres. '
+                'Inclusion des résultats à accès privé.'
+            ))
+        search_description = search_description.format(
+            search_preset=search_preset.name, radius=radius
+        )
     else:
-        search_description = "Paramètres invalides."
+        search_description = _("Paramètres invalides.")
     
     was_limited = getattr(request, 'limited', False)
     if was_limited:
-        errors.append(
-            "\nTrop peu de requêtes ont été faites en trop peu de temps. "
+        errors.append('\n' + _(
+            "Trop de requêtes ont été faites en trop peu de temps. "
             "Merci d'attendre quelques secondes avant de raffraichir la page."
-        )
+        ))
     error_msg = '<br/>\n'.join(errors)
     
     permalink = utils.get_permalink(request, use_get_params, search_preset_id, user_latitude, user_longitude, radius, no_private)
@@ -165,10 +171,10 @@ def handle_500_get_results(view):
                 {
                     "status": "error", "error": str(e),
                     "err_msg": (
-                        "<center><em>Erreur 500" +
-                        "</em></center><br/><center><em>" +
-                        "Désolé, une erreur non prise en charge "
-                        "s'est produite.</em></center>"
+                        '<center><em>' + _("Erreur 500") +
+                        '.</em></center><br/><center><em>' +
+                        _("Désolé, une erreur non prise en charge "
+                        "s'est produite.") + '</em></center>'
                     )
                 }
             )
@@ -195,6 +201,7 @@ def get_results(request):
         no_private = False
     rendered_results = []
     status = "error"
+    fail_msg = ''
     err_msg = ''
     debug_msg = ''
     filter_panel = ''
@@ -218,16 +225,26 @@ def get_results(request):
             filter_panel = utils.render_filter_panel(results)
         status = "ok"
         debug_logger.debug("Request successfull!")
+        if not results:
+            fail_msg = '<center><em>' + _("Pas de résultats.") + '</em></center>'
     except geopy.exc.GeopyError as e:
-        err_msg = "Une erreur s'est produite lors de l'acquisition de vos coordonnées. Vous pouvez essayer de recharger la page dans quelques instants."
+        err_msg = _(
+            "Une erreur s'est produite lors de l'acquisition "
+            "de vos coordonnées. Vous pouvez essayer de recharger "
+            "la page dans quelques instants."
+        )
         debug_msg = str(e)
         debug_logger.debug("Geopy error: {}".format(str(e)))
     except overpass.OverpassError as e:
-        err_msg = "Une erreur s'est produite lors de la requête vers les serveurs d'OpenStreetMap. Vous pouvez essayer de recharger la page dans quelques instants."
+        err_msg = _(
+            "Une erreur s'est produite lors de la requête vers "
+            "les serveurs d'OpenStreetMap. Vous pouvez essayer "
+            "de recharger la page dans quelques instants."
+        )
         debug_msg = str(e)
         debug_logger.debug("Overpass error: {}".format(str(e)))
     except Exception as e:
-        err_msg = "Une erreur non prise en charge s'est produite."
+        err_msg = _("Une erreur non prise en charge s'est produite.")
         debug_msg = str(e)
         debug_logger.debug("Unhandled error: {}".format(str(e)))
     # Logs the request to make statistics.
@@ -311,7 +328,7 @@ def light_home(request):
             search_preset = SearchPreset.objects.get(id=search_preset_id)
         except (SearchPreset.DoesNotExist, ValueError):
             get_params_valid = False
-            errors.append("L'ID de l'objet de votre recherche est invalide.")
+            errors.append(_("L'ID de l'objet de votre recherche est invalide."))
             search_preset_id = 0
             search_preset = None
         try:
@@ -319,7 +336,7 @@ def light_home(request):
             user_longitude = float(get_params[2])
         except ValueError:
             get_params_valid = False
-            errors.append("Vos coordonnées sont invalides.")
+            errors.append(_("Vos coordonnées sont invalides."))
             user_latitude = 0.0
             user_longitude = 0.0
         if settings.TESTING:
@@ -333,13 +350,13 @@ def light_home(request):
         if user_address:
             user_address = escape(user_address[1])
         else:
-            user_address = "Adresse inconnue"
+            user_address = _("Adresse inconnue")
             # Does not set "get_params_valid" to False, because
             # the address is not useful for searching.
-            errors.append(
+            errors.append(_(
                 "Vos coordonnées n'ont pas permis de trouver votre "
                 "adresse actuelle."
-            )
+            ))
         try:
             radius = int(get_params[3])
             radius_extreme_values = settings.GOOSE_META["radius_extreme_values"]
@@ -349,7 +366,7 @@ def light_home(request):
                 raise ValueError
         except ValueError:
             get_params_valid = False
-            errors.append("Le rayon de recherche demandé est invalide.")
+            errors.append(_("Le rayon de recherche demandé est invalide."))
             radius = 0
         no_private = get_params[4] == '1'
     else:
@@ -364,22 +381,27 @@ def light_home(request):
     user_coords = (user_latitude, user_longitude)
     
     if search_preset:
-        private_descriptor = {
-            True: "Exclusion",
-            False: "Inclusion"
-        }.get(no_private, False)
-        search_description = (
-            '"{}" dans un rayon de {} mètres. '
-            '{} des résultats à accès privé.'
-        ).format(search_preset.name, radius, private_descriptor)
+        if no_private:
+            search_description = (_(
+                '"{search_preset}" dans un rayon de {radius} mètres. '
+                'Exclusion des résultats à accès privé.'
+            ))
+        else:
+            search_description = (_(
+                '"{search_preset}" dans un rayon de {radius} mètres. '
+                'Inclusion des résultats à accès privé.'
+            ))
+        search_description = search_description.format(
+            search_preset=search_preset.name, radius=radius
+        )
     else:
-        search_description = "Paramètres invalides."
+        search_description = _("Paramètres invalides.")
     
     if was_limited:
-        error.append(
-            "\nTrop peu de requêtes ont été faites en trop peu de temps. "
+        error.append('\n' + _(
+            "Trop de requêtes ont été faites en trop peu de temps. "
             "Merci d'attendre quelques secondes avant de raffraichir la page."
-        )
+        ))
     error_msg = '<br/>\n'.join(errors)
     
     permalink = utils.get_permalink(request, use_get_params, search_preset.id, user_latitude, user_longitude, radius, no_private)
@@ -392,7 +414,7 @@ def light_home(request):
             "error_msg": error_msg
         })
     
-    rendered_results = []
+    results = []
     error_msg = ''
     try:
         results = utils.get_results(
@@ -402,13 +424,24 @@ def light_home(request):
         utils.get_all_addresses(results)
         debug_logger.debug("Request successfull!")
     except geopy.exc.GeopyError as e:
-        error_msg = "Une erreur s'est produite lors de l'acquisition de vos coordonnées. Vous pouvez essayer de recharger la page dans quelques instants."
+        err_msg = _(
+            "Une erreur s'est produite lors de l'acquisition "
+            "de vos coordonnées. Vous pouvez essayer de recharger "
+            "la page dans quelques instants."
+        )
+        debug_msg = str(e)
         debug_logger.debug("Geopy error: {}".format(str(e)))
     except overpass.OverpassError as e:
-        error_msg = "Une erreur s'est produite lors de la requête vers les serveurs d'OpenStreetMap. Vous pouvez essayer de recharger la page dans quelques instants."
+        err_msg = _(
+            "Une erreur s'est produite lors de la requête vers "
+            "les serveurs d'OpenStreetMap. Vous pouvez essayer "
+            "de recharger la page dans quelques instants."
+        )
+        debug_msg = str(e)
         debug_logger.debug("Overpass error: {}".format(str(e)))
     except Exception as e:
-        error_msg = "Une erreur non prise en charge s'est produite."
+        err_msg = _("Une erreur non prise en charge s'est produite.")
+        debug_msg = str(e)
         debug_logger.debug("Unhandled error: {}".format(str(e)))
     # Logs the request to make statistics.
     # Doesn't logs if the request comes from an authenticated user,

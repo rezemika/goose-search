@@ -49,7 +49,7 @@ html, body {
 }
 
 #results_list {
-    list-style:none
+    list-style: none;
 }
 
 .osm-link-logo {

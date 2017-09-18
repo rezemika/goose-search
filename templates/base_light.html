@@ -3,6 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="fr">
     <head>
         <title>{% block title %}Goose Light{% endblock %}</title>
+        {% load i18n %}
         <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
         <meta name="generator" content="Geany 1.27"/>
         <meta name="description" content={{ GOOSE_META.description }}/>
@@ -13,9 +14,9 @@
         <nav class="navbar">
             <a class="navbar-brand" href="{% url 'light' %}">Goose Light</a>
             <ul class="navbar-links">
-                <li><a href="{% url 'light' %}">Recherche light</a></li>
-                <li><a href="{% url 'light-about' %}">À propos</a></li>
-                <li><a href="{% url 'home' %}">Version classique</a></li>
+                <li><a href="{% url 'light' %}">{% blocktrans %}Recherche light{% endblocktrans %}</a></li>
+                <li><a href="{% url 'light-about' %}">{% blocktrans %}À propos{% endblocktrans %}</a></li>
+                <li><a href="{% url 'home' %}">{% blocktrans %}Version classique{% endblocktrans %}</a></li>
             </ul>
             <a class="navbar-text" href="{{ VERSION.version_url }}">{{ VERSION.name }}</a>
         </nav>

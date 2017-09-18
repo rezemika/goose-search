@@ -15,6 +15,8 @@ from django.utils.html import escape
 from django.template.loader import render_to_string
 from goose import settings
 from search import test_mockers
+from django.utils.translation import ugettext as _
+from django.utils.translation import get_language
 
 geolocator = geopy.geocoders.Nominatim(timeout=10)
 debug_logger = logging.getLogger("DEBUG")
@@ -31,7 +33,7 @@ def try_geolocator_reverse(coords):
     while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
         try:
             position = geolocator.reverse(
-                coords, language="fr"
+                coords, language=get_language().split('-')[0]
             )
             return position
         except geopy.exc.GeopyError as e:
@@ -53,7 +55,7 @@ def try_geolocator_geocode(address):
     while attempts < settings.GOOSE_META["max_geolocation_attempts"]:
         try:
             position = geolocator.geocode(
-                address, language="fr"
+                address, language=get_language().split('-')[0]
             )
             return position
         except geopy.exc.GeopyError as e:
@@ -254,8 +256,7 @@ def parse_csv_data(result, csv_line, address_data):
                 result.osm_meta[1]
             )
         )
-        # List of address getters
-        address = "Adresse estimée : {housenumber} {street}, {postcode} {city}".format(
+        address = _("Adresse estimée : {housenumber} {street}, {postcode} {city}").format(
             housenumber=address_data[0],
             street=address_data[1],
             postcode=address_data[2],
@@ -268,7 +269,7 @@ def parse_csv_data(result, csv_line, address_data):
                 result.osm_meta[1]
             )
         )
-        address = "Adresse estimée : {housenumber} {street}".format(
+        address = _("Adresse estimée : {housenumber} {street}").format(
             housenumber=address_data[0],
             street=address_data[1]
         )
@@ -285,7 +286,7 @@ def parse_csv_data(result, csv_line, address_data):
         )[1]
         if not address:
             return ''
-        address = "Adresse estimée : {}".format(address)
+        address = _("Adresse estimée : {}").format(address)
     return address
 
 def get_all_addresses(results):
@@ -369,15 +370,18 @@ class Result:
         ).m)
         self.bearing = get_bearing(user_coordinates, self.coordinates)
         self.direction = deg2dir(self.bearing)
-        # TODO : Make it independent to timezones ?
         oh_field = self.properties.get("opening_hours")
         self.opening_hours = None
+        lang = get_language().split('-')[0]
+        if lang not in ["fr", "en"]:
+            lang = "en"
         if oh_field:
             try:
+                # TODO : Use a smaller module.
                 # From https://stackoverflow.com/a/39457871
                 timezone_str = tzwhere.tzNameAt(user_coordinates[0], user_coordinates[1])
                 self.opening_hours = humanized_opening_hours.HumanizedOpeningHours(
-                    oh_field, "fr", tz=pytz.timezone(timezone_str)
+                    oh_field, lang, tz=pytz.timezone(timezone_str)
                 )
             except humanized_opening_hours.HOHError:
                 # TODO : Warn user ?
@@ -415,7 +419,7 @@ class Result:
                     lon=self.coordinates[1]
                 )
             )
-            return "Adresse : Adresse inconnue"
+            return _("Adresse : Adresse inconnue")
     
     def get_default_address(self):
         address_data = {
@@ -425,16 +429,16 @@ class Result:
             "postcode": self.properties.get("addr:postcode")
         }
         if all(address_data.values()):
-            return "Adresse exacte : {}, {}, {} {}".format(
-                escape(address_data["housenumber"]),
-                escape(address_data["street"]),
-                escape(address_data["postcode"]),
-                escape(address_data["city"])
+            return _("Adresse exacte : {housenumber} {street}, {postcode} {city}").format(
+                housenumber=escape(address_data["housenumber"]),
+                street=escape(address_data["street"]),
+                postcode=escape(address_data["postcode"]),
+                city=escape(address_data["city"])
             )
         elif address_data["housenumber"] and address_data["street"]:
-            return "Adresse exacte : {}, {}".format(
-                escape(address_data["housenumber"]),
-                escape(address_data["street"])
+            return _("Adresse exacte : {housenumber}, {street}").format(
+                housenumber=escape(address_data["housenumber"]),
+                street=escape(address_data["street"])
             )
         else:
             return ''
@@ -473,30 +477,110 @@ class Result:
                 tags.append(("wheelchair:no", "Non accessible aux aux fauteuils roulants", 'ZBC'))
         else:
             tags.append(("wheelchair:unknown", "Accessibilité aux fauteuils roulants inconnue", 'ZBD'))
-        '''
-        # Diet.
-        diet = self.properties.get("diet:vegetarian")
-        if diet:
-            if diet == "yes":
-                tags.append("vegetarian:yes")
-            elif diet == "only":
-                tags.append("vegetarian:only")
-            else:
-                tags.append("vegetarian:no")
-        else:
-            tags.append("vegetarian:unknown")
-        diet = self.properties.get("diet:vegan")
-        if diet:
-            if diet == "yes":
-                tags.append("vegan:yes")
-            elif diet == "only":
-                tags.append("vegan:only")
-            else:
-                tags.append("vegetarian:no")
-        else:
-            tags.append("vegan:unknown")
-        '''
         return tags
+    
+    def render(self, render_tags=True, link_to_osm=True, opening_hours=True, oh_in_popover=True, itinerary=True):
+        """
+            Returns an HTML div (with "result-box" class) displaying
+            a result and its properties.
+        """
+        html = '<div role="article" class="result-box">{}</div>'
+        content = ''
+        data = []
+        name = self.properties.get("name")
+        if name:
+            data.append((_("Nom : {}") + '\n').format(escape(name)))
+        if self.opening_hours is not None:
+            if self.opening_hours.is_open():
+                data.append('<b>' + _("Ouvert") + '</b>\n')
+            else:
+                data.append('<b>' + _("Fermé") + '</b>\n')
+        data.append(_("Distance : {distance} mètres").format(distance=self.distance))
+        data.append((_("Direction : {degrees}° {direction}") + '\n').format(
+            degrees=self.bearing, direction=self.direction
+        ))
+        
+        phone = self.properties.get("phone")
+        if phone:
+            phone_string = _("Téléphone : ")
+            data.append(
+                (
+                    '<span class="glyphicon glyphicon-phone-alt '
+                    'inline-icon" aria-hidden="true"></span>{phone_string}'
+                    '<a href="tel:{phone}">{phone}</a>\n'
+                ).format(phone_string=phone_string, phone=escape(phone))
+            )
+        
+        data.append(self.get_address())
+        
+        result_properties = self.search_preset.render_pr(self.properties)
+        
+        try:
+            if opening_hours and self.opening_hours is not None:
+                opening_hours_text = self.opening_hours.stringify_week_schedules()
+                if oh_in_popover:
+                    oh_string = _("Horaires d'ouverture")
+                    oh_content = (
+                        '<button type="button" class="btn btn-default"'
+                        ' data-toggle="popover" title="Horaires d\'ouverture"'
+                        ' data-content="{}" data-html="true"'
+                        ' data-placement="right">'
+                        '<span class="glyphicon glyphicon-time inline-icon"'
+                        ' aria-hidden="true"></span>{oh_string}</button>'
+                    ).format(opening_hours_text.replace("\n", "<br>"), oh_string=oh_string)
+                else:
+                    oh_content = (
+                        '<div class="small-box">{}</div>'
+                    ).format(opening_hours_text.replace("\n", "<br>"))
+                data.append('\n' + oh_content)
+        except Exception as e:
+            debug_logger.error(
+                "Error of HOH ({}) on rendering opening hours of the result (OSM_ID: {}).".format(
+                    str(e), self.osm_meta[1]
+                )
+            )
+        
+        data.append('\n' + result_properties)
+        debug_logger.debug(data)
+        # Removes unusefull linebreaks.
+        data = [output_data for output_data in data if output_data is not '\n']
+        content += '\n'.join(data)
+        
+        if itinerary:
+            itinerary_url = (
+                'https://www.openstreetmap.org/directions?'
+                'engine=graphhopper_foot&route={},{};{},{}'
+            ).format(
+                self.user_coords[0], self.user_coords[1],
+                self.coordinates[0], self.coordinates[1]
+            )
+            itinerary_string = _("Itinéraire jusqu'à ce point")
+            itinerary_link = (
+                '<a href="{}"><span class="glyphicon glyphicon-road'
+                ' inline-icon" aria-hidden="true"></span>{itinerary_string}</a>'
+            ).format(itinerary_url, itinerary_string=itinerary_string)
+            content += '\n\n' + itinerary_link
+        
+        if link_to_osm:
+            osm_link = "http://www.openstreetmap.org/{}/{}".format(
+                self.osm_meta[0],
+                self.osm_meta[1]
+            )
+            content = (
+                '<a href="{}"><img class="osm-link-logo" '
+                'src="/static/images/osm_logo.png"></a>'
+            ).format(osm_link) + content
+        
+        if render_tags:
+            tags_list = ';'.join(self.tags)
+            result_tags = (
+                '<span class="result_tags" style="visibility:hidden">{tags}</span>'
+            ).format(
+                tags=tags_list
+            )
+            content += result_tags
+        
+        return html.format(content)
     
     def __str__(self):
         return "<result ({coords}) {distance}m>".format(

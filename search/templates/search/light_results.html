@@ -1,28 +1,29 @@
 {% extends "base_light.html" %}
 {% load static %}
+{% load i18n %}
 {% load geo_extras %}
 
-{% block title %}Goose Light — Résultats de recherche{% endblock %}
+{% block title %}{% blocktrans %}Goose Light — Résultats de recherche{% endblocktrans %}{% endblock %}
 
 {% block content %}
-    <h2>Résultats de la recherche</h2>
+    <h2>{% blocktrans %}Résultats de la recherche{% endblocktrans %}</h2>
     <div class="small-box" role="complementary">
-        <p>Voici votre localisation estimée :</p>
+        <p>{% blocktrans %}Voici votre localisation estimée :{% endblocktrans %}</p>
         <ul>
-            <li>Latitude : {{ user_coords.0|render_coordinate }}</li>
-            <li>Longitude : {{ user_coords.1|render_coordinate }}</li>
-            <li>Adresse : {{ user_address }}</li>
+            <li>{% trans "Latitude : " %}{{ user_coords.0|render_coordinate }}</li>
+            <li>{% trans "Longitude : " %}{{ user_coords.1|render_coordinate }}</li>
+            <li>{% trans "Adresse : " %}{{ user_address }}</li>
         </ul>
-        <p>Recherche : {{ search_description }}</p>
-        <p>Les résultats sont triés par ordre croissant de distance par rapport à votre position. Les liens de guidage sont prévus pour des piétons.</p>
+        <p>{% trans "Recherche : " %}{{ search_description }}{% if use_get_params %} {% blocktrans %}Cette recherche utilise un permalien.{% endblocktrans %}{% endif %}</p>
+        <p>{% blocktrans %}Les résultats sont triés par ordre croissant de distance par rapport à votre position. Les liens de guidage sont prévus pour des piétons.{% endblocktrans %}</p>
         {% if not error_msg %}
-        <p>Permalien vers cette recherche : <a href="{{ permalink }}">{{ permalink }}</a></p>
+        <p>{% blocktrans %}Permalien vers cette recherche : {% endblocktrans %}<a href="{{ permalink }}">{{ permalink }}</a></p>
         {% endif %}
     </div>
     <br/>
-    <center><form action="{% url 'home' %}"><input type="submit" value="Nouvelle recherche" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
+    <center><form action="{% url 'home' %}"><input type="submit" value="{% trans 'Nouvelle recherche' %}" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
     {% if results %}<br/>
-    <em>{{ results|length }} résultat{{ results|pluralize }}</em></center>{% endif %}
+    <em>{% blocktrans with count=results|length plural=results|pluralize %}{{ count }} résultat{{ plural }}{% endblocktrans %}</em></center>{% endif %}
     <hr>
     <div id="results_list">
         {% if error_msg %}
@@ -31,7 +32,7 @@
             {% for result in results %}
                 {% include "search/result_block.part.html" with result=result render_tags=0 oh_in_popover=0 light=1 %}
             {% empty %}
-                <center><em>Pas de résultats.</em></center>
+                <center><em>{% blocktrans %}Pas de résultats.{% endblocktrans %}</em></center>
             {% endfor %}
         {% endif %}
     </div>

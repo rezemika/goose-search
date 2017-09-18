@@ -1,32 +1,33 @@
 {% extends "base.html" %}
 {% load static %}
+{% load i18n %}
 {% load geo_extras %}
 
-{% block title %}Goose — Résultats de recherche{% endblock %}
+{% block title %}{% blocktrans %}Goose — Résultats de recherche{% endblocktrans %}{% endblock %}
 
 {% block content %}
-    <h2>Résultats de la recherche</h2>
+    <h2>{% blocktrans %}Résultats de la recherche{% endblocktrans %}</h2>
     <div class="alert alert-info" role="complementary">
-        <p>Voici votre localisation estimée :</p>
+        <p>{% blocktrans %}Voici votre localisation estimée :{% endblocktrans %}</p>
         <ul>
-            <li>Latitude : {{ user_coords.0|render_coordinate }}</li>
-            <li>Longitude : {{ user_coords.1|render_coordinate }}</li>
-            <li>Adresse : {{ user_address }}</li>
+            <li>{% blocktrans %}Latitude : {% endblocktrans %}{{ user_coords.0|render_coordinate }}</li>
+            <li>{% blocktrans %}Longitude : {% endblocktrans %}{{ user_coords.1|render_coordinate }}</li>
+            <li>{% blocktrans %}Adresse : {% endblocktrans %}{{ user_address }}</li>
         </ul>
         <br/>
-        <p>Recherche : {{ search_description }} {% if use_get_params %}Cette recherche utilise un permalien.{% endif %}</p>
+        <p>{% blocktrans %}Recherche : {{ search_description }}{% endblocktrans %} {% if use_get_params %}{% blocktrans %}Cette recherche utilise un permalien.{% endblocktrans %}{% endif %}</p>
         <br/>
-        <p>Les résultats sont triés par ordre croissant de distance par rapport à votre position. Les liens de guidage sont prévus pour des piétons.</p>
+        <p>{% blocktrans %}Les résultats sont triés par ordre croissant de distance par rapport à votre position. Les liens de guidage sont prévus pour des piétons.{% endblocktrans %}</p>
         {% if not error_msg %}
         <br/>
-        <p>Permalien vers cette recherche : <a href="{{ permalink }}">{{ permalink }}</a></p>
+        <p>{% blocktrans %}Permalien vers cette recherche : {% endblocktrans %}<a href="{{ permalink }}">{{ permalink }}</a></p>
         {% endif %}
     </div>
-    <form action="{% url 'home' %}"><input type="submit" value="Nouvelle recherche" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
+    <form action="{% url 'home' %}"><input type="submit" value="{% trans 'Nouvelle recherche' %}" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
     
     <div id="map_container">
         <form id="map_getter_form">
-            <input disabled="true" type="submit" id="map_getter" value="Charger la carte" class="btn btn-secondary btn-mobile btn-sharp btn-block btn-gray">
+            <input disabled="true" type="submit" id="map_getter" value="{% trans 'Charger la carte' %}" class="btn btn-secondary btn-mobile btn-sharp btn-block btn-gray">
         </form>
     </div>
     
@@ -68,7 +69,7 @@
                         startZoom = 15;
                         userCoords = [{{ user_coords.0|safe }}, {{ user_coords.1|safe }}];
                         youAreHereMsg = "Vous êtes ici.";
-                        mapCopyright = '<a href="https://leafletjs.com/">&copy; Les contributeurs d’<a href="https://osm.org/copyright">OpenStreetMap</a>';
+                        mapCopyright = "{% trans '<a href=\"https://leafletjs.com/\">&copy; Les contributeurs d’<a href=\"https://osm.org/copyright\">OpenStreetMap</a>' %}";
                         var results_map = load_map(startCoordinates, startZoom, userCoords, youAreHereMsg, mapCopyright);
                         update_map_size();
                         console.log("All done!");
@@ -98,7 +99,7 @@
             <div class="sk-circle11 sk-child"></div>
             <div class="sk-circle12 sk-child"></div>
         </div>
-        <h3 class="center">Recherche…</h3>
+        <h3 class="center">{% blocktrans %}Recherche…{% endblocktrans %}</h3>
         <br>
     </div>
     <link rel="stylesheet" type="text/css" href="{% static 'css/loading-animation.css' %}" />

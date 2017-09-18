@@ -27,9 +27,9 @@ function request_results (radius, userLatitude, userLongitude, searchPresetId, n
                 $('#geo_results').attr("aria-busy", "false");
                 return
             }
-            if (!json.content.length) {
+            if (json.fail_msg) {
                 console.log('json content is empty')
-                $('#geo_results').html("<center><em>Pas de résultats.</em></center>");
+                $('#geo_results').html(json.fail_msg);
                 $('#geo_results').attr("aria-live", "assertive");
                 $('#geo_results').attr("aria-busy", "false");
                 console.log('Success, but no results !');
@@ -64,7 +64,9 @@ function request_results (radius, userLatitude, userLongitude, searchPresetId, n
 
         // Handles a non-successful response.
         error: function (xhr, errmsg, err) {
-            $('#geo_results').html("<center><em>Erreur 500.</em></center><br/><center><em>Désolé, une erreur non prise en charge s'est produite.</em></center>")
+            // This should not happen, because a 500 error should be
+            // caught by 'handle_500_get_results'.
+            $('#geo_results').html("<center><em>Error 500</em></center>")
             // Provides a bit more info about the error to the console.
             console.log(JSON.stringify(xhr, null, 2));
             $('#map_getter').prop("disabled", false);
