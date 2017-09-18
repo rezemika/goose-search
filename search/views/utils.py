@@ -2,6 +2,7 @@ import geopy
 from geopy import distance
 import pytz
 import humanized_opening_hours
+from tzwhere import tzwhere
 from math import sin, cos, atan2, degrees
 from goose import settings
 import overpass
@@ -16,6 +17,7 @@ from search import test_mockers
 
 geolocator = geopy.geocoders.Nominatim(timeout=10)
 debug_logger = logging.getLogger("DEBUG")
+tzwhere = tzwhere.tzwhere()
 
 def try_geolocator_reverse(coords):
     """
@@ -395,8 +397,10 @@ class Result:
         self.opening_hours = None
         if oh_field:
             try:
+                # From https://stackoverflow.com/a/39457871
+                timezone_str = tzwhere.tzNameAt(user_coordinates[0], user_coordinates[1])
                 self.opening_hours = humanized_opening_hours.HumanizedOpeningHours(
-                    oh_field, "fr", tz=pytz.timezone("Europe/Paris")
+                    oh_field, "fr", tz=pytz.timezone(timezone_str)
                 )
             except humanized_opening_hours.HOHError:
                 # TODO : Warn user ?
