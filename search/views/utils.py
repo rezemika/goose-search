@@ -520,14 +520,22 @@ class Result:
         name = self.properties.get("name")
         if name:
             data.append("Nom : {}\n".format(escape(name)))
+        
+        description = self.properties.get("description")
+        direction_linebreak = '\n'
+        if description:
+            description_block = '<hr/>\n' + description + '\n<hr/>'
+            data.append(description_block)
+            direction_linebreak = ''
+        
         if self.opening_hours is not None:
             if self.opening_hours.is_open():
                 data.append("<b>Ouvert</b>\n")
             else:
                 data.append("<b>Fermé</b>\n")
         data.append("Distance : {distance} mètres".format(distance=self.distance))
-        data.append("Direction : {degrees}° {direction}\n".format(
-            degrees=self.bearing, direction=self.direction
+        data.append("Direction : {degrees}° {direction}{lb}".format(
+            degrees=self.bearing, direction=self.direction, lb=direction_linebreak
         ))
         
         phone = self.properties.get("phone")
@@ -538,6 +546,15 @@ class Result:
                     'inline-icon" aria-hidden="true"></span>Téléphone : '
                     '<a href="tel:{phone}">{phone}</a>\n'
                 ).format(phone=escape(phone))
+            )
+        website = self.properties.get("website")
+        if website:
+            data.append(
+                (
+                    '<span class="glyphicon glyphicon-globe '
+                    'inline-icon" aria-hidden="true"></span>Site web : '
+                    '<a href="{link}">{link}</a>\n'
+                ).format(link=website)
             )
         
         data.append(self.get_address())

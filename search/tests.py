@@ -219,15 +219,13 @@ class ViewsTest(TestCase):
             self.fail("The distance from the test result can not be found.")
         if "Direction : 107.6° E →" not in test_result:
             self.fail("The direction from thee test result can not be found.")
-        if (
-            'Téléphone : <a href="tel:+354 411 1111">'
-            '+354 411 1111</a>'
-        ) not in test_result:
+        if 'Téléphone : <a href="tel:+354 411 1111">+354 411 1111</a>' not in test_result:
             self.fail("The phone number of the test result can not be found.")
-        if (
-                'Téléphone : <a href="tel:+354 411 1111">+354 411 1111</a>'
-                '\n\nAdresse estimée : '
-            ) not in test_result:
+        if '<hr/>\nA great city hall!\n<hr/>' not in test_result:
+            self.fail("The description of the test result can not be found.")
+        if 'Site web : <a href="example.com">example.com</a>' not in test_result:
+            self.fail("The website link of the test result can not be found.")
+        if '\nAdresse estimée : ' not in test_result:
             self.fail("The address of the test result can not be found.")
         return
 
@@ -279,13 +277,7 @@ class LightViewsTest(TestCase):
                 '+354 411 1111</a>'
             )
         )
-        self.assertContains(
-            response, (
-                'Téléphone : <a href="tel:+354 411 1111">'
-                '+354 411 1111</a><br/><br/>'
-                'Adresse estimée : '
-            )
-        )
+        self.assertContains(response, '<br/>Adresse estimée : ')
         # Same test, but including private results.
         form_data = {
             "user_latitude": "64.14624",

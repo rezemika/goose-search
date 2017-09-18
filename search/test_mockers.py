@@ -108,7 +108,9 @@ def geojsons():
             "name": "City Hall of Reykjavik",
             "opening_hours": "Mo-Fr 08:00-19:00",
             "wheelchair": "yes",
-            "phone": "+354 411 1111"
+            "phone": "+354 411 1111",
+            "description": "A great city hall!",
+            "website": "example.com",
         }
     })
     return results
