@@ -11,6 +11,12 @@ html, body {
     margin-bottom: 30px;
 }
 
+.btn-gray {
+    /* Fixes a bug making invisible the background of 'btn-secondary'
+     * on Firefox Mobile. */
+    background-color: #CECECE;
+}
+
 .result-box {
     margin-bottom: 1em;
     border: solid 1px;

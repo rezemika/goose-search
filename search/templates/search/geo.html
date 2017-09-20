@@ -10,7 +10,7 @@
             {{ limit_error|safe }}
             {% csrf_token %}
             {{ form.as_p }}
-            <input type="button" id="localisation-btn" value="Me localiser" onclick="getLocationConstant()" class="btn btn-secondary btn-mobile btn-sharp"/>
+            <input type="button" id="localisation-btn" value="Me localiser" onclick="getLocationConstant()" class="btn btn-secondary btn-mobile btn-sharp btn-gray"/>
             <input type="submit" id="submit-btn" value="Envoyer" class="btn btn-primary btn-mobile btn-sharp"/>
         </div>
     </form>
