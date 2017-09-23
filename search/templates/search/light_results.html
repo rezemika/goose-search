@@ -29,7 +29,7 @@
             <center><em>{{ error_msg }}</em></center>
         {% else %}
             {% for result in results %}
-                {{ result|safe }}
+                {% include "search/result_block.part.html" with result=result render_tags=0 oh_in_popover=0 %}
             {% empty %}
                 <center><em>Pas de résultats.</em></center>
             {% endfor %}

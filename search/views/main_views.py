@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, HttpResponseForbidden
+from django.template.loader import render_to_string
 from django.utils.html import escape
 from search.models import SearchPreset
 from search.forms import SearchForm
@@ -181,8 +182,12 @@ def get_results(request):
         utils.get_all_addresses(results)
         for result in results:
             tags_count = utils.get_all_tags(results)
-            tags_filter = utils.render_tag_filter(tags_count, len(results))
-            rendered_results.append("<li>" + result.render() + "</li>")
+            result_block = render_to_string(
+                "search/result_block.part.html",
+                {"result": result, "render_tags": True, "oh_in_popover": True}
+            )
+            rendered_results.append('<li>' + result_block + '</li>')
+        tags_filter = utils.render_tag_filter(tags_count, len(results))
         status = "ok"
         debug_logger.debug("Request successfull!")
     except geopy.exc.GeopyError as e:
@@ -342,12 +347,6 @@ def light_home(request):
             no_private
         )
         utils.get_all_addresses(results)
-        for result in results:
-            rendered_results.append(str(
-                "<li>" + result.render(
-                    render_tags=False, oh_in_popover=False
-                ).replace('\n', '<br/>') + "</li>"
-            ))
         debug_logger.debug("Request successfull!")
     except geopy.exc.GeopyError as e:
         error_msg = "Une erreur s'est produite lors de l'acquisition de vos coordonnées. Vous pouvez essayer de recharger la page dans quelques instants."
@@ -374,7 +373,7 @@ def light_home(request):
         )
     
     return render(request, "search/light_results.html", {
-        "results": rendered_results,
+        "results": results,
         "user_coords": user_coords,
         "user_address": user_address,
         "search_description": search_description,

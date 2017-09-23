@@ -1,0 +1,49 @@
+{% load geo_extras %}
+
+<div role="article" class="result-box">
+    {{ result|render_osm_link|safe }}
+    {% if render_tags %}
+        <span class="result_tags" style="visibility:hidden" aria-hidden="true">{{ result.tags|join:';' }}</span>
+    {% endif %}
+    {% if result.properties|get_item:"name" %}
+        <p style="margin-top: -1em;">Nom : {{ result.properties.name|escape }}<br/></p>
+    {% endif %}
+    {% if result.properties|get_item:"description" %}
+        <hr/>
+        <p>{{ result.properties.description|escape }}</p>
+        <hr/>
+    {% endif %}
+    {% if result.opening_hours %}
+        <p>
+        {% if result.opening_hours.is_open %}
+            <b>Ouvert</b>
+        {% else %}
+            <b>Fermé</b>
+        {% endif %}
+        <br/></p>
+    {% endif %}
+    <p>
+        Distance : {{ result.distance }} mètres<br/>
+        Direction : {{ result.bearing }}° {{ result.direction }}<br/>
+    </p>
+    {% if result.properties|get_item:"phone" %}
+        <span class="glyphicon glyphicon-phone-alt inline-icon" aria-hidden="true"></span>
+        Téléphone : <a href="tel:{{ result.properties.phone }}">{{ result.properties.phone|escape }}</a><br/>
+    {% endif %}
+    {% if result.properties|get_item:"website" %}
+        <span class="glyphicon glyphicon-globe inline-icon" aria-hidden="true"></span>
+        Site web : <a href="{{ result.properties.website }}">{{ result.properties.website|escape }}</a><br/>
+    {% endif %}
+    <p style="margin-top: 1em; margin-bottom: 1em;">
+        {{ result.get_address }}
+    </p>
+    {% if result.opening_hours %}
+        <p>{{ result|render_opening_hours:oh_in_popover|safe }}</p>
+    {% endif %}
+    <p>
+        {{ result|render_properties }}<br/>
+    </p>
+    <p>
+        {{ result|render_address_link|safe }}
+    </p>
+</div>

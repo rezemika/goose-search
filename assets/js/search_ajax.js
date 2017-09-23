@@ -35,9 +35,9 @@ function request_results (radius, userLatitude, userLongitude, searchPresetId, n
                 return
             }
             // Allowings linebreaks.
-            const htmlOutput = json.content.map(part => '\n\n' + part.replace(/\r?\n/g, '<br>\n')).join('');
+            //const htmlOutput = json.content.map(part => '\n\n' + part.replace(/\r?\n/g, '<br>\n')).join('');
             // Fills the page.
-            $('#geo_results').html('<ul id="results_list">' + htmlOutput + '</ul>');
+            $('#geo_results').html('<ul id="results_list">' + json.content.join('') + '</ul>');
             // Updates the ARIA.
             $('#geo_results').attr("aria-live", "assertive");
             $('#geo_results').attr("aria-busy", "false");
