@@ -40,7 +40,7 @@ def home(request):
             return redirect("results")
     else:
         form = SearchForm()
-    return render(request, "search/geo.html", locals())
+    return render(request, "search/home.html", locals())
 
 @ratelimit(key='ip', rate="3/m")
 def results(request):
@@ -138,7 +138,7 @@ def results(request):
     error_msg = '<br/>\n'.join(errors)
     
     permalink = utils.get_permalink(request, use_get_params, search_preset_id, user_latitude, user_longitude, radius, no_private)
-    return render(request, "search/geo_results.html", {
+    return render(request, "search/results.html", {
         "user_coords": (user_latitude, user_longitude),
         "user_address": user_address,
         "radius": radius,
@@ -242,11 +242,11 @@ def light_home(request):
     )
     if request.method != "POST" and not all(get_params):
         form = SearchForm()
-        return render(request, "search/geo.html", locals())
+        return render(request, "search/home.html", locals())
     if not all(get_params):
         form = SearchForm(request.POST)
         if not form.is_valid():
-            return render(request, "search/geo.html", locals())
+            return render(request, "search/home.html", locals())
         form.clean()
     was_limited = getattr(request, 'limited', False)
     errors = []
