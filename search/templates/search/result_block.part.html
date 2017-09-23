@@ -6,7 +6,8 @@
         <span class="result_tags" style="visibility:hidden" aria-hidden="true">{{ result.tags|join:';' }}</span>
     {% endif %}
     {% if result.properties|get_item:"name" %}
-        <p style="margin-top: -1em;">Nom : {{ result.properties.name|escape }}<br/></p>
+        {# TODO : Improve / clean. #}
+        <p{% if not light %} style="margin-top: -1em;"{% endif %}>Nom : {{ result.properties.name|escape }}<br/></p>
     {% endif %}
     {% if result.properties|get_item:"description" %}
         <hr/>

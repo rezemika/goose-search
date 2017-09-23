@@ -184,7 +184,10 @@ def get_results(request):
             tags_count = utils.get_all_tags(results)
             result_block = render_to_string(
                 "search/result_block.part.html",
-                {"result": result, "render_tags": True, "oh_in_popover": True}
+                {
+                    "result": result, "render_tags": True,
+                    "oh_in_popover": True, "light": False
+                }
             )
             rendered_results.append('<li>' + result_block + '</li>')
         tags_filter = utils.render_tag_filter(tags_count, len(results))
