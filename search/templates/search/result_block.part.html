@@ -6,8 +6,11 @@
         <span class="result_tags" style="visibility:hidden" aria-hidden="true">{{ result.tags|join:';' }}</span>
     {% endif %}
     {% if result.properties|get_item:"name" %}
+        {# Fixes the padding on the top of the box when there is no name. #}
         {# TODO : Improve / clean. #}
         <p{% if not light %} style="margin-top: -1em;"{% endif %}>Nom : {{ result.properties.name|escape }}<br/></p>
+    {% elif not light %}
+        <div style="margin-top: -1em;"></div>
     {% endif %}
     {% if result.properties|get_item:"description" %}
         <hr/>
