@@ -15,9 +15,8 @@ function filter_results_handler (object) {
     }
     console.log("Active filters: " + active_filters);
     for (i = 0; i < li.length; i++) {
-        spans = li[i].getElementsByTagName("span");
-        last_span = spans[spans.length - 1];
-        result_tags = last_span.innerHTML.split(';');
+        span = li[i].getElementsByClassName("result_tags")[0];
+        result_tags = span.innerHTML.split(';');
         // Checks all the result tags are included in the active filters.
         show_result = result_tags.every(tag => active_filters.indexOf(tag) > -1);
         if (show_result == true) {
