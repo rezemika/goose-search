@@ -44,9 +44,13 @@
     {% if result.opening_hours %}
         <p>{{ result|render_opening_hours:oh_in_popover|safe }}</p>
     {% endif %}
+    {% with properties=result|render_properties %}
+    {% if properties %}
     <p>
-        {{ result|render_properties }}<br/>
+        {{ properties|linebreaksbr }}
     </p>
+    {% endif %}
+    {% endwith %}
     <p>
         {{ result|render_address_link|safe }}
     </p>

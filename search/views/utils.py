@@ -114,7 +114,7 @@ def get_address(coords=None, address=None, skip_gov_api=False, mocking_parameter
             if not r or (r.latitude == r.longitude == 0.0 and r.address == None):
                 return None
         result_lat, result_lon = r.latitude, r.longitude
-        result_address = r.address.split(',')[:5]
+        result_address = ', '.join(r.address.split(',')[:5])
     return ((result_lat, result_lon), result_address)
 
 def get_bearing(coords1, coords2):
