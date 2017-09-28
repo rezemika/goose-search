@@ -190,7 +190,8 @@ def get_results(request):
                 }
             )
             rendered_results.append('<li>' + result_block + '</li>')
-        tags_filter = utils.render_tag_filter(tags_count, len(results))
+        if results:
+            tags_filter = utils.render_tag_filter(tags_count, len(results))
         status = "ok"
         debug_logger.debug("Request successfull!")
     except geopy.exc.GeopyError as e:
