@@ -102,7 +102,7 @@ class SearchPreset(models.Model):
                     values_output_list = []
                     for value in [i for i in values_list if i in possible_values]:
                         values_output_list.append(displayed_values[possible_values.index(value)])
-                    if '*' in possible_values:
+                    if not values_output_list and '*' in possible_values:
                         values_output_list.append(displayed_values[possible_values.index('*')])
                     if not values_output_list:
                         continue
