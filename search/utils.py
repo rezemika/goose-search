@@ -104,6 +104,10 @@ def get_address(coords=None, address=None, skip_gov_api=False, mocking_parameter
         # TODO : Improve label.
         result_address = result[0]["properties"]["label"]
         result_is_valid = all((result_lat, result_lon, result_address))
+        # Dirty patch to fix a weird problem with the API.
+        housenumber = result[0]["properties"]["housenumber"]
+        if len(housenumber) == 4 and housenumber.startswith('90'):
+            result_is_valid = False
     if not result or not result_is_valid:
         if coords:
             r = try_geolocator_reverse(coords)
@@ -271,20 +275,25 @@ def parse_csv_data(result, csv_line, address_data):
     """
     # Checks address_data contains at least one information,
     # and / including the street name.
-    if all(address_data):
+    # Dirty patch to fix a weird problem with the API.
+    valid = True
+    if len(address_data[0]) == 4 and address_data[0].startswith('90'):
+        valid = False
+    if all(address_data) and valid:
         debug_logger.debug(
             "The address from '{}' is full (OSM_ID: {}).".format(
                 csv_line,
                 result.osm_meta[1]
             )
         )
+        # List of address getters
         address = "Adresse estimée : {housenumber} {street}, {postcode} {city}".format(
             housenumber=address_data[0],
             street=address_data[1],
             postcode=address_data[2],
             city=address_data[3]
         )
-    elif address_data[0] and address_data[1]:
+    elif address_data[0] and address_data[1] and valid:
         debug_logger.debug(
             "The address from '{}' is usable (but not full) (OSM_ID: {}).".format(
                 csv_line,

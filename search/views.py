@@ -8,7 +8,7 @@ from search.models import SearchPreset
 from search.forms import SearchForm
 from ratelimit.decorators import ratelimit
 from goose import settings
-from search.views import utils
+from search import utils
 import geopy
 import overpass
 import logging
