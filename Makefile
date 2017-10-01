@@ -19,6 +19,9 @@ reset-db:
 run-back:
 	python3 manage.py runserver 0.0.0.0:8000
 
+test:
+	python3 manage.py test search
+
 help:
 	@echo "install-back: updates the current virtualenv with the content of 'requirements.txt'"
 	@echo "collectstatic: collects the staticfiles for the admin pages"
@@ -27,3 +30,4 @@ help:
 	@echo "new-secret-key: generates a new SECRET_KEY"
 	@echo "reset-db: resets the database"
 	@echo "run-back: runs the development server on port 8000"
+	@echo "test: runs the unit tests"
