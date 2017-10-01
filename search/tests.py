@@ -215,18 +215,12 @@ class ViewsTest(TestCase):
                 test_result = result
         if not test_result:
             self.fail("Test result can not be found.")
-        if "Distance : 11990937 mètres" not in test_result:
-            self.fail("The distance from the test result can not be found.")
-        if "Direction : 107.6° E →" not in test_result:
-            self.fail("The direction from thee test result can not be found.")
-        if 'Téléphone : <a href="tel:+354 411 1111">+354 411 1111</a>' not in test_result:
-            self.fail("The phone number of the test result can not be found.")
-        if '<hr/>\nA great city hall!\n<hr/>' not in test_result:
-            self.fail("The description of the test result can not be found.")
-        if 'Site web : <a href="example.com">example.com</a>' not in test_result:
-            self.fail("The website link of the test result can not be found.")
-        if '\nAdresse estimée : ' not in test_result:
-            self.fail("The address of the test result can not be found.")
+        self.assertIn("Distance : 11990937 mètres", test_result)
+        self.assertIn("Direction : 107,6° E →", test_result)
+        self.assertIn('Téléphone : <a href="tel:+354 411 1111">+354 411 1111</a><br/>', test_result)
+        self.assertIn("<hr/>\n        <p>A great city hall!</p>\n        <hr/>", test_result)
+        self.assertIn('Site web : <a href="example.com">example.com</a>', test_result)
+        self.assertIn("Adresse estimée : ", test_result)
         return
 
 class LightViewsTest(TestCase):
@@ -270,14 +264,14 @@ class LightViewsTest(TestCase):
         self.assertContains(response, "Exclusion des résultats à accès privé.")
         self.assertContains(response, "Nom : City Hall of Reykjavik")
         self.assertContains(response, "Distance : 11990937 mètres")
-        self.assertContains(response, "Direction : 107.6° E →")
+        self.assertContains(response, "Direction : 107,6° E →")
         self.assertContains(
             response, (
                 'Téléphone : <a href="tel:+354 411 1111">'
                 '+354 411 1111</a>'
             )
         )
-        self.assertContains(response, '<br/>Adresse estimée : ')
+        self.assertContains(response, 'Adresse estimée : ')
         # Same test, but including private results.
         form_data = {
             "user_latitude": "64.14624",
