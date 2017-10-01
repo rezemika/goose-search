@@ -105,9 +105,12 @@ def get_address(coords=None, address=None, skip_gov_api=False, mocking_parameter
         result_address = result[0]["properties"]["label"]
         result_is_valid = all((result_lat, result_lon, result_address))
         # Dirty patch to fix a weird problem with the API.
-        housenumber = result[0]["properties"]["housenumber"]
-        if len(housenumber) == 4 and housenumber.startswith('90'):
-            result_is_valid = False
+        try:
+            housenumber = result[0]["properties"]["housenumber"]
+            if len(housenumber) == 4 and housenumber.startswith('90'):
+                result_is_valid = False
+        except KeyError:
+            pass
     if not result or not result_is_valid:
         if coords:
             r = try_geolocator_reverse(coords)
