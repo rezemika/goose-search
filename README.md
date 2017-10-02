@@ -1,18 +1,29 @@
-Goose - Un moteur de recherche géographique utilisant OpenStreetMap
+Goose — Un moteur de recherche géographique utilisant OpenStreetMap
 ===================================================================
 
-**Goose** (acronyme récursif pour *Goose Offers an Openstreetmap Search Engine*) est un moteur de recherche géographique utilisant les données d'OpenStreetMap pour retourner une liste de points d'intérêt à proximité. Il est disponnible à l'adresse [goose-sear.ch](https://goose-sear.ch/).
-
-Ce dépôt utilise [le "cactus model"](https://barro.github.io/2016/02/a-succesful-git-branching-model-considered-harmful/). Le développement se fait dans la branche 'master', les versions de production sont mergées dans la branche 'prod'.
+**Goose** (acronyme récursif pour *Goose Offers an Openstreetmap Search Engine*) est un moteur de recherche géographique utilisant les données d’OpenStreetMap pour retourner une liste de points d’intérêt à proximité. Il est disponnible à l’adresse [goose-sear.ch](https://goose-sear.ch/).
 
 # Fonctionnalités
 
-- Bouton "Me localiser" évitant d'avoir à retranscrire ses coordonnées GPS
-- Possibilité de renseigner une adresse au lieu de ses coordonnées GPS
-- Chargement des résultats avec Ajax
-- Affichage des propriétés des résultat modifiable selon la recherche effectuée
-- Version ultralégère (Goose Light), proposant des pages épurées (environ 25Ko pour 15 résultats)
-- Permaliens de recherche, permettant refaire une même recherche sans re-remplir le formulaire
+- Bouton "Me localiser" évitant d’avoir à retranscrire ses coordonnées GPS.
+- Possibilité de renseigner une adresse au lieu de ses coordonnées GPS.
+- Chargement des résultats avec Ajax.
+- Affichage des propriétés des résultat modifiable selon la recherche effectuée.
+- Version ultralégère (Goose Light), proposant des pages épurées (environ 25Ko pour 15 résultats).
+- Permaliens de recherche, permettant refaire une même recherche sans re-remplir le formulaire.
+
+# Installation
+
+- Cloner le dépôt : `git clone https://github.com/rezemika/goose-search/`
+- Se placer sur une version spécifique : `git checkout -b vX.X.X`
+- Entrer dans un virtual environment en Python 3.
+- Installer les dépendances : `make install-back`
+- Faire les migrations : `make migrate`
+- Collecter les fichiers statiques : `make collectstatic`
+- Générer une nouvelle SECRET_KEY : `make new-secret-key`
+- Charger les "données d’usine" : `make load-factory-data`
+- Lancer les tests unitaires : `make test`
+- Lancer le serveur de développement : `make run-back`
 
 # Licence
 
