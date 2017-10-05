@@ -5,6 +5,10 @@
     <br/>
     <div class="alert alert-info" role="complementary">Goose est un outil de recherche géographique. Vous pouvez entrer vos coordonnées GPS avec le bouton "Me localiser" ou entrer une adresse. Choisissez le sujet de votre recherche, le rayon (en mètres) et cliquez sur "Envoyer". La requête peut prendre un certain temps.</div>
     <br/>
+    <noscript>
+        <div class="alert alert-danger" role="alert">La recherche classique de Goose nécessite Javascript pour fonctionner correctement. Activez-le dans votre navigateur, ou utilisez <a href="{% url 'light' %}">Goose Light</a> pour faire une recherche sans Javascript.</div>
+        <br/>
+    </noscript>
     <form method="post" action="" id="geoform">
         <div role="search">
             {{ limit_error|safe }}
