@@ -4,8 +4,6 @@ import geopy
 from goose import settings
 from search import utils
 
-geolocator = geopy.geocoders.Nominatim(timeout=2000)
-
 class SearchForm(forms.Form):
     """
         The form used on the main page to search a point of interest.
@@ -80,8 +78,7 @@ class SearchForm(forms.Form):
                 "fournir une adresse.",
                 code='invalid'
             )
-        attempts = 0
-        position = None
+        position = None  # TODO : Remove?
         if user_address:
             position = utils.get_address(
                 address=user_address,
