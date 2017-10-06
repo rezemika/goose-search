@@ -92,6 +92,7 @@ def results(request):
             user_address = "Adresse inconnue"
             # Does not set "get_params_valid" to False, because
             # the address is not useful for searching.
+            # TODO : Don't append error?
             errors.append(
                 "Vos coordonnées n'ont pas permis de trouver votre "
                 "adresse actuelle."
@@ -152,7 +153,29 @@ def results(request):
         }
     )
 
+def handle_500_get_results(view):
+    """
+        Returns a JSON response even in case of 500 error.
+    """
+    def wrapper(*args, **kwargs):
+        try:
+            return view(*args, **kwargs)
+        except Exception as e:
+            return JsonResponse(
+                {
+                    "status": "error", "error": str(e),
+                    "err_msg": (
+                        "<center><em>Erreur 500" +
+                        "</em></center><br/><center><em>" +
+                        "Désolé, une erreur non prise en charge "
+                        "s'est produite.</em></center>"
+                    )
+                }
+            )
+    return wrapper
+
 @csrf_exempt
+@handle_500_get_results
 def get_results(request):
     """
         Used by Ajax to get the results.
