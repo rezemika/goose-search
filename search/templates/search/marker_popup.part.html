@@ -1,0 +1,36 @@
+{% load geo_extras %}
+
+<div name="#{{ result|render_anchor:'map' }}">
+    {% if result.properties|get_item:"name" %}<center>{{ result.properties.name|escape }}</center>{% endif %}
+    <br/>
+    <a href="#{{ result|render_anchor:'block' }}">
+        <span class="glyphicon glyphicon-tag inline-icon" aria-hidden="true"></span>
+        Voir le bloc
+    </a>
+    <br/>
+    {% if result.opening_hours %}
+        <p>
+        {% if result.opening_hours.is_open %}
+            <b>Ouvert</b>
+        {% else %}
+            <b>Fermé</b>
+        {% endif %}
+        <br/></p>
+    {% endif %}
+    <p>{{ result.get_address }}</p>
+    <p>
+        Distance : {{ result.distance }} mètres<br/>
+        Direction : {{ result.bearing }}° {{ result.direction }}<br/>
+    </p>
+    {% if result.properties|get_item:"phone" %}
+        <span class="glyphicon glyphicon-phone-alt inline-icon" aria-hidden="true"></span>
+        Téléphone : <a href="tel:{{ result.properties.phone }}">{{ result.properties.phone|escape }}</a><br/>
+    {% endif %}
+    {% with properties=result|render_properties %}
+        {% if properties %}
+        <p>
+            {{ properties|linebreaksbr }}
+        </p>
+        {% endif %}
+    {% endwith %}
+</div>

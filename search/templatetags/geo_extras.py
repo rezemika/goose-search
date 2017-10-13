@@ -79,3 +79,12 @@ def render_bool_js(value):
         return "true"
     else:
         return "false"
+
+@register.filter()
+def render_anchor(result, suffix):
+    anchor = "result_{type}_{id}_{suffix}".format(
+        type=result.osm_meta[0],
+        id=result.osm_meta[1],
+        suffix=suffix
+    )
+    return anchor

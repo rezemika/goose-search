@@ -2,6 +2,7 @@
 // Thanks to vhf for his precious help for the debug.
 
 function request_results (radius, userLatitude, userLongitude, searchPresetId, noPrivate) {
+    window.map_results = [];
     console.log('Starting request...')
     $.ajax({
         url: '/getresults/', // Destination URL.
@@ -34,10 +35,14 @@ function request_results (radius, userLatitude, userLongitude, searchPresetId, n
                 console.log('Success, but no results !');
                 return
             }
-            // Allowings linebreaks.
-            //const htmlOutput = json.content.map(part => '\n\n' + part.replace(/\r?\n/g, '<br>\n')).join('');
             // Fills the page.
             $('#geo_results').html('<ul id="results_list">' + json.content.join('') + '</ul>');
+            window.map_results = json.map_data;
+            console.log('Map data: ' + map_results);
+            // Enables the button to load the map.
+            $('#map_getter').prop("disabled", false);
+            // Hides all the links to the map, as it is not loaded yet.
+            $('.seeonmap-link').hide();
             // Updates the ARIA.
             $('#geo_results').attr("aria-live", "assertive");
             $('#geo_results').attr("aria-busy", "false");
@@ -53,7 +58,6 @@ function request_results (radius, userLatitude, userLongitude, searchPresetId, n
             $('[data-toggle="popover"]').popover();
             // Loads filters.
             $('#results_filters').html(json.filters);
-            $("<br/>").insertBefore('#results_filters');
             console.log(json.filters);
             console.log('Success !');
         },
@@ -63,6 +67,7 @@ function request_results (radius, userLatitude, userLongitude, searchPresetId, n
             $('#geo_results').html("<center><em>Erreur 500.</em></center><br/><center><em>Désolé, une erreur non prise en charge s'est produite.</em></center>")
             // Provides a bit more info about the error to the console.
             console.log(JSON.stringify(xhr, null, 2));
+            $('#map_getter').prop("disabled", false);
         },
     })
 };

@@ -9,6 +9,7 @@ from search.forms import SearchForm
 from ratelimit.decorators import ratelimit
 from goose import settings
 from search import utils
+from search.templatetags import geo_extras
 import geopy
 import overpass
 import logging
@@ -174,6 +175,7 @@ def get_results(request):
     err_msg = ''
     debug_msg = ''
     tags_filter = ''
+    results = []
     try:
         results = utils.get_results(
             search_preset, (user_latitude, user_longitude), radius,
@@ -220,9 +222,34 @@ def get_results(request):
                 lon=round(user_longitude)
             )
         )
+    map_data = []
+    for result in results:
+        result_str = render_to_string(
+            "search/marker_popup.part.html",
+            {"result": result}
+        )
+        marker_id = geo_extras.render_anchor(result, "map")
+        map_data.append((result.osm_meta, result.coordinates, result_str, marker_id))
     return HttpResponse(json.dumps({
-            "status": status, "content": rendered_results, "err_msg": err_msg,
-            "debug_msg": debug_msg, "filters": tags_filter
+            "status": status, "content": rendered_results,
+            "filters": tags_filter, "map_data": map_data,
+            "err_msg": err_msg, "debug_msg": debug_msg
+        }),
+        content_type="application/json"
+    )
+
+@csrf_exempt
+def get_map(request):
+    """
+        Used by Ajax to get the results.
+    """
+    if not request.is_ajax():
+        return HttpResponseForbidden("This URL if for Ajax only.")
+    
+    html = render_to_string("search/map.part.html")
+    
+    return HttpResponse(json.dumps({
+            "html_map": html,
         }),
         content_type="application/json"
     )

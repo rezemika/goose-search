@@ -1,6 +1,6 @@
 {% load geo_extras %}
 
-<div role="article" class="result-box">
+<div role="article" class="result-box" id="{{ result|render_anchor:'block' }}">
     {{ result|render_osm_link|safe }}
     {% if render_tags %}
         <span class="result_tags" style="visibility:hidden" aria-hidden="true">{{ result.tags|join:';' }}</span>
@@ -30,7 +30,9 @@
         Distance : {{ result.distance }} mètres<br/>
         Direction : {{ result.bearing }}° {{ result.direction }}<br/>
     </p>
+    <a href="javascript: see_on_map('{{ result|render_anchor:'map' }}')" class="seeonmap-link"><span class="glyphicon glyphicon-tag inline-icon" aria-hidden="true"></span>Voir sur la carte</a>
     {% if result.properties|get_item:"phone" %}
+        <br/>
         <span class="glyphicon glyphicon-phone-alt inline-icon" aria-hidden="true"></span>
         Téléphone : <a href="tel:{{ result.properties.phone }}">{{ result.properties.phone|escape }}</a><br/>
     {% endif %}

@@ -23,6 +23,61 @@
         {% endif %}
     </div>
     <form action="{% url 'home' %}"><input type="submit" value="Nouvelle recherche" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
+    
+    <div id="map_container">
+        <form id="map_getter_form">
+            <input disabled="true" type="submit" id="map_getter" value="Charger la carte" class="btn btn-secondary btn-mobile btn-sharp btn-block btn-gray">
+        </form>
+    </div>
+    
+    <div id="form-messages"></div>
+    
+    <script type="text/javascript" src="{% static 'js/leaflet-utils.js' %}"></script>
+    
+    <script type="text/javascript" >
+        $("#map_getter").click(function(event) {
+            console.log("Requesting the map.");
+            event.preventDefault();
+            $.ajax({
+                type: "POST",
+                url: "{% url 'getmap' %}",
+                data: {},
+                success: function(json) {
+                    console.log("Received:" + JSON.stringify(json, null, 2));
+                    // Shows the map.
+                    $("#map_container").html(json.html_map);
+                    // Shows the links (fake anchors) to the markers on the map.
+                    $(".seeonmap-link").show();
+                    preload();
+                },
+                error: function (xhr, errmsg, err) {
+                    console.log(JSON.stringify(xhr, null, 2));
+                },
+            });
+        });
+        
+        $(window).on("orientationchange resize", update_map_size);
+        
+        function preload() {
+            console.log("Loading the required JS files before requesting the map.");
+            $.getScript("{% static 'js/leaflet-utils.js' %}", function() {
+                $.getScript("{% static 'js/leaflet.js' %}", function() {
+                    $.getScript("{% static 'js/Leaflet.fullscreen.min.js' %}", function () {
+                        console.log("Done! Now, requesting the map.");
+                        startCoordinates = [46.495, 2.207];
+                        startZoom = 15;
+                        userCoords = [{{ user_coords.0|safe }}, {{ user_coords.1|safe }}];
+                        youAreHereMsg = "Vous êtes ici.";
+                        mapCopyright = '<a href="https://leafletjs.com/">&copy; Les contributeurs d’<a href="https://osm.org/copyright">OpenStreetMap</a>';
+                        var results_map = load_map(startCoordinates, startZoom, userCoords, youAreHereMsg, mapCopyright);
+                        update_map_size();
+                        console.log("All done!");
+                    });
+                });
+            });
+        }
+    </script>
+    
     <form id="results_filters">
     </form>
     <hr>
@@ -49,6 +104,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'css/loading-animation.css' %}" />
     <script type="text/javascript" src="{% static 'js/search_filters.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/search_ajax.js' %}"></script>
+    
     <script type="text/javascript">
         var userLatitude = {{ user_coords.0|render_coordinate }};
         var userLongitude = {{ user_coords.1|render_coordinate }};
@@ -58,6 +114,9 @@
         $(document).ready(function() {
             request_results(radius, userLatitude, userLongitude, searchPresetId, noPrivate);
         });
+        
+        // Disables the button to get the map, awaiting the results.
+        $('#map_getter').prop('disabled', true);
     </script>
     {% else %}
     <div id="geo_results">

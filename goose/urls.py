@@ -7,6 +7,7 @@ urlpatterns = [
     url(r'^$', views.home, name='home'),
     url(r'^results/$', views.results, name='results'),
     url(r'^getresults/$', views.get_results, name='getresults'),
+    url(r'^getmap/$', views.get_map, name='getmap'),
     url(r'^about/$', views.about, name='about'),
     url(r'^light/$', views.light_home, name='light'),
     url(r'^light/about/$', views.about, name='light-about'),
