@@ -98,7 +98,7 @@
             <div class="sk-circle11 sk-child"></div>
             <div class="sk-circle12 sk-child"></div>
         </div>
-        <center><h3>Recherche…</h3></center>
+        <h3 class="center">Recherche…</h3>
         <br>
     </div>
     <link rel="stylesheet" type="text/css" href="{% static 'css/loading-animation.css' %}" />
@@ -120,7 +120,7 @@
     </script>
     {% else %}
     <div id="geo_results">
-        <center><em>{{ error_msg }}</em></center>
+        <em class="center">{{ error_msg }}</em>
     </div>
     {% endif %}
 {% endblock %}

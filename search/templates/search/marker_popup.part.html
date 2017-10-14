@@ -1,7 +1,7 @@
 {% load geo_extras %}
 
 <div name="#{{ result|render_anchor:'map' }}">
-    {% if result.properties|get_item:"name" %}<center>{{ result.properties.name|escape }}</center>{% endif %}
+    {% if result.properties|get_item:"name" %}<span class="center">{{ result.properties.name|escape }}</span>{% endif %}
     <br/>
     <a href="#{{ result|render_anchor:'block' }}">
         <span class="glyphicon glyphicon-tag inline-icon" aria-hidden="true"></span>

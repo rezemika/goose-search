@@ -457,7 +457,7 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/results/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "<center><em>")
+        self.assertNotContains(response, '<em class="center">')
         self.assertContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 64.14624")
         self.assertContains(response, "Longitude : -21.94259")
@@ -477,7 +477,7 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/results/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "<center><em>")
+        self.assertNotContains(response, '<em class="center">')
         self.assertContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 64.14624")
         self.assertContains(response, "Longitude : -21.94259")
@@ -499,7 +499,7 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/results/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<center><em>L&#39;ID de l&#39;objet de votre recherche est invalide.</em></center>")
+        self.assertContains(response, '<em class="center">L&#39;ID de l&#39;objet de votre recherche est invalide.</em>')
         self.assertNotContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 64.14624")
         self.assertContains(response, "Longitude : -21.94259")
@@ -514,7 +514,7 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/results/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<center><em>Le rayon de recherche demandé est invalide.</em></center>")
+        self.assertContains(response, '<em class="center">Le rayon de recherche demandé est invalide.</em>')
         self.assertNotContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 64.14624")
         self.assertContains(response, "Longitude : -21.94259")
@@ -530,7 +530,7 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/results/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<center><em>Le rayon de recherche demandé est invalide.</em></center>")
+        self.assertContains(response, '<em class="center">Le rayon de recherche demandé est invalide.</em>')
         self.assertNotContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 64.14624")
         self.assertContains(response, "Longitude : -21.94259")
@@ -546,7 +546,7 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/results/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<center><em>Vos coordonnées sont invalides.</em></center>")
+        self.assertContains(response, '<em class="center">Vos coordonnées sont invalides.</em>')
         self.assertNotContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 0.0")
         self.assertContains(response, "Longitude : 0.0")
@@ -573,7 +573,7 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/light/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "<center><em>")
+        self.assertNotContains(response, '<em class="center">')
         self.assertContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 64.14624")
         self.assertContains(response, "Longitude : -21.94259")
@@ -594,7 +594,7 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/light/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "<center><em>")
+        self.assertNotContains(response, '<em class="center">')
         self.assertContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 64.14624")
         self.assertContains(response, "Longitude : -21.94259")
@@ -617,7 +617,7 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/results/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<center><em>L&#39;ID de l&#39;objet de votre recherche est invalide.</em></center>")
+        self.assertContains(response, '<em class="center">L&#39;ID de l&#39;objet de votre recherche est invalide.</em>')
         self.assertNotContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 64.14624")
         self.assertContains(response, "Longitude : -21.94259")
@@ -632,7 +632,7 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/results/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<center><em>Le rayon de recherche demandé est invalide.</em></center>")
+        self.assertContains(response, '<em class="center">Le rayon de recherche demandé est invalide.</em>')
         self.assertNotContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 64.14624")
         self.assertContains(response, "Longitude : -21.94259")
@@ -648,7 +648,7 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/results/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<center><em>Le rayon de recherche demandé est invalide.</em></center>")
+        self.assertContains(response, '<em class="center">Le rayon de recherche demandé est invalide.</em>')
         self.assertNotContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 64.14624")
         self.assertContains(response, "Longitude : -21.94259")
@@ -664,7 +664,7 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/results/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<center><em>Vos coordonnées sont invalides.</em></center>")
+        self.assertContains(response, '<em class="center">Vos coordonnées sont invalides.</em>')
         self.assertNotContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 0.0")
         self.assertContains(response, "Longitude : 0.0")

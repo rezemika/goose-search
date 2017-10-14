@@ -11,6 +11,12 @@ html, body {
     margin-bottom: 30px;
 }
 
+.center {
+    text-align: center;
+    display: block;
+    margin: auto;
+}
+
 .btn-gray {
     /* Fixes a bug making invisible the background of 'btn-secondary'
      * on Firefox Mobile. */
