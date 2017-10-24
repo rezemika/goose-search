@@ -456,6 +456,7 @@ def light_home(request):
         error_msg = _("Une erreur non prise en charge s'est produite.")
         debug_msg = str(e)
         debug_logger.debug("Unhandled error: {}".format(str(e)))
+        raise e
     # Logs the request to make statistics.
     # Doesn't logs if the request comes from an authenticated user,
     # as it is probably an admin.
