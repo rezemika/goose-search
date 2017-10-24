@@ -2,7 +2,6 @@ import geopy
 from geopy import distance
 import pytz
 import humanized_opening_hours
-from tzwhere import tzwhere
 from math import sin, cos, atan2, degrees
 from goose import settings
 import overpass
@@ -20,7 +19,6 @@ from django.utils.translation import get_language
 
 geolocator = geopy.geocoders.Nominatim(timeout=10)
 debug_logger = logging.getLogger("DEBUG")
-tzwhere = tzwhere.tzwhere()
 
 def try_geolocator_reverse(coords):
     """
@@ -160,7 +158,7 @@ def get_permalink(request, use_get_params, search_preset_id, user_latitude, user
         )
     return permalink
 
-def get_results(search_preset, user_coords, radius, no_private):
+def get_results(search_preset, user_coords, radius, no_private, timezone_name):
     """
         Returns a list of dicts with the properties of all results.
     """
@@ -201,7 +199,7 @@ def get_results(search_preset, user_coords, radius, no_private):
     for element in response:
         if no_private and element["properties"].get("access") in ["private", "no"]:
             continue
-        results.append(Result(str(uuid4()), element, search_preset, user_coords))
+        results.append(Result(str(uuid4()), element, search_preset, user_coords, timezone_name))
     results = sorted(results, key=lambda result: result.distance)
     debug_logger.debug("Got {} result(s).".format(len(results)))
     return results
@@ -346,7 +344,7 @@ class Result:
     """
         A result and its properties.
     """
-    def __init__(self, uuid, geojson, search_preset, user_coordinates):
+    def __init__(self, uuid, geojson, search_preset, user_coordinates, timezone_name):
         self.uuid = uuid
         if geojson['geometry']['type'] == "Point":
             self.osm_meta = ("node", geojson["id"])
@@ -377,11 +375,8 @@ class Result:
             lang = "en"
         if oh_field:
             try:
-                # TODO : Use a smaller module.
-                # From https://stackoverflow.com/a/39457871
-                timezone_str = tzwhere.tzNameAt(user_coordinates[0], user_coordinates[1])
                 self.opening_hours = humanized_opening_hours.HumanizedOpeningHours(
-                    oh_field, lang, tz=pytz.timezone(timezone_str)
+                    oh_field, lang, tz=pytz.timezone(timezone_name)
                 )
             except humanized_opening_hours.HOHError:
                 # TODO : Warn user ?

@@ -10,6 +10,7 @@ from search.forms import SearchForm
 from ratelimit.decorators import ratelimit
 from goose import settings
 from search import utils
+from timezonefinder import TimezoneFinder
 from search.templatetags import geo_extras
 import geopy
 import overpass
@@ -17,6 +18,7 @@ import logging
 import json
 
 debug_logger = logging.getLogger("DEBUG")
+tf = TimezoneFinder()
 
 def home(request):
     """
@@ -207,9 +209,14 @@ def get_results(request):
     filter_panel = ''
     results = []
     try:
+        timezone_name = tf.timezone_at(lat=user_latitude, lng=user_longitude)
+        if timezone_name is None:
+            timezone_name = tf.closest_timezone_at(lat=user_latitude, lng=user_longitude)
+        if timezone_name is None:
+            timezone_name = 'UTC'
         results = utils.get_results(
             search_preset, (user_latitude, user_longitude), radius,
-            no_private
+            no_private, timezone_name
         )
         utils.get_all_addresses(results)
         for result in results:
@@ -414,17 +421,23 @@ def light_home(request):
             "error_msg": error_msg
         })
     
+    timezone_name = tf.timezone_at(lat=user_latitude, lng=user_longitude)
+    if timezone_name is None:
+        timezone_name = tf.closest_timezone_at(lat=user_latitude, lng=user_longitude)
+    if timezone_name is None:
+        timezone_name = 'UTC'
+    
     results = []
     error_msg = ''
     try:
         results = utils.get_results(
             search_preset, user_coords, radius,
-            no_private
+            no_private, timezone_name
         )
         utils.get_all_addresses(results)
         debug_logger.debug("Request successfull!")
     except geopy.exc.GeopyError as e:
-        err_msg = _(
+        error_msg = _(
             "Une erreur s'est produite lors de l'acquisition "
             "de vos coordonnées. Vous pouvez essayer de recharger "
             "la page dans quelques instants."
@@ -432,7 +445,7 @@ def light_home(request):
         debug_msg = str(e)
         debug_logger.debug("Geopy error: {}".format(str(e)))
     except overpass.OverpassError as e:
-        err_msg = _(
+        error_msg = _(
             "Une erreur s'est produite lors de la requête vers "
             "les serveurs d'OpenStreetMap. Vous pouvez essayer "
             "de recharger la page dans quelques instants."
@@ -440,7 +453,7 @@ def light_home(request):
         debug_msg = str(e)
         debug_logger.debug("Overpass error: {}".format(str(e)))
     except Exception as e:
-        err_msg = _("Une erreur non prise en charge s'est produite.")
+        error_msg = _("Une erreur non prise en charge s'est produite.")
         debug_msg = str(e)
         debug_logger.debug("Unhandled error: {}".format(str(e)))
     # Logs the request to make statistics.
