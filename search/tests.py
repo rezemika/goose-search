@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
-from search.models import SearchPreset
+from search.models import SearchPreset, Filter
 from search.forms import SearchForm
 from django.contrib.auth.models import User
 from django.utils.html import escape
@@ -26,6 +26,77 @@ class UtilsTest(TestCase):
             utils.get_bearing((48.8500, 2.3325), (51.5044, -0.1113)),
             244.4
         )
+        return
+
+class FakeResult:
+    # Mocks a real Result object.
+    def __init__(self, properties):
+        self.properties = properties
+        return
+
+class FilterTest(TestCase):
+    """
+        Tests the Filter model.
+    """
+    
+    def test_validation_valid(self):
+        f = Filter()
+        f.name = "Test filter",
+        f.processing_rules = "fee=yes == paying == Payant"
+        f.full_clean()
+        # Tests for multiline processing rules.
+        f.processing_rules = "fee=yes == paying == Payant\nfee=no == free == Gratuit"
+        f.full_clean()
+        # Tests with an equal sign ('=') in the OSM tags.
+        f.processing_rules = "math=1+1=2 == maths == Maths"
+        f.full_clean()
+        return
+    
+    def test_validation_invalid(self):
+        f = Filter()
+        f.name = "Test filter"
+        with self.assertRaises(ValidationError):
+            f.processing_rules = 'DISPLAY "Nom" "name"'
+            f.full_clean()
+        with self.assertRaises(ValidationError):
+            f.processing_rules = "fee==yes == paying == Payant"
+            f.full_clean()
+        with self.assertRaises(ValidationError):
+            f.processing_rules = "fee=yes == paying == Payant == Gratuit"
+            f.full_clean()
+        return
+    
+    def test_parsing(self):
+        result = FakeResult({
+            "name": "Au bon marché",
+            "shop": "greengrocer",
+            "fee": "yes",
+        })
+        
+        f = Filter()
+        f.name = "Test filter"
+        
+        # Regular test.
+        f.processing_rules = "shop=greengrocer == greengrocer == Primeur"
+        tag = f.parse_result(result)
+        self.assertEqual(tag, ("greengrocer", "Primeur", "Test filter"))
+        
+        f.processing_rules = "shop=supermarket == supermarket == Supermarché"
+        tag = f.parse_result(result)
+        self.assertEqual(tag, None)
+        
+        # Tests with multilines processing rules.
+        f.processing_rules = """\
+        fee=yes == paying == Payant
+        fee=no == free == Gratuit"""
+        tag = f.parse_result(result)
+        self.assertEqual(tag, ("paying", "Payant", "Test filter"))
+        
+        f.processing_rules = """\
+        fee=maybe == unknown_fees == Prix inconnu
+        fee=no == free == Gratuit"""
+        tag = f.parse_result(result)
+        self.assertEqual(tag, None)
         return
 
 class SearchPresetTest(TestCase):

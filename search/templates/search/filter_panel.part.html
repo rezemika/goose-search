@@ -1,0 +1,22 @@
+<div class="panel panel-default">
+    <div class="panel-heading" role="tab" id="headingTwo">
+        <h4 class="panel-title">
+            <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    <center>Filtrer les résultats <span class="badge">{{ count }}</span></center>
+            </a>
+        </h4>
+    </div>
+    <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
+        <div class="panel-body">
+            {% for tag in tags %}
+                <input
+                    type="checkbox" checked
+                    onchange="filter_results_handler(this)"
+                    name="result_filter" id="filter_{{ tag.slug_name }}"
+                    value="{{ tag.slug_name }}"
+                >
+                <label for="filter_{{ tag.slug_name }}"> {{ tag.label }} <span class="badge">{{ tag.count }}</span></label><br/>
+            {% endfor %}
+        </div>
+    </div>
+</div>

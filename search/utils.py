@@ -6,12 +6,13 @@ from tzwhere import tzwhere
 from math import sin, cos, atan2, degrees
 from goose import settings
 import overpass
-from collections import OrderedDict
+from collections import namedtuple, Counter, OrderedDict
 import requests
 import io
 import logging
 from uuid import uuid4
 from django.utils.html import escape
+from django.template.loader import render_to_string
 from goose import settings
 from search import test_mockers
 
@@ -203,73 +204,37 @@ def get_results(search_preset, user_coords, radius, no_private):
     debug_logger.debug("Got {} result(s).".format(len(results)))
     return results
 
-def render_tag_filter(tags, count):
+def render_filter_panel(results):
     """
         Returns a raw HTML form allowing to filter results (uses JS)
         from a dict of tags and the total number of results.
     """
-    html = """\
-    <div class="panel panel-default">
-        <div class="panel-heading" role="tab" id="headingTwo">
-            <h4 class="panel-title">
-                <a class="collapsed" role="button" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        <center>Filtrer les résultats <span class="badge">{count}</span></center>
-                </a>
-            </h4>
-        </div>
-        <div id="collapseTwo" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingTwo">
-            <div class="panel-body">
-                {content}
-            </div>
-        </div>
-    </div>
-    """
-    output = ''
-    # TODO : Make it cleaner.
-    tag_names = OrderedDict()
-    tag_names["open"] = "Ouvert"
-    tag_names["closed"] = "Fermé"
-    tag_names["unknown_schedules"] = "Horaires inconnues"
-    tag_names["vegetarian:yes"] = "Menu végétarien"
-    tag_names["vegetarian:only"] = "Entièrement végétarien"
-    tag_names["vegetarian:no"] = "Non végétarien"
-    tag_names["vegetarian:unknown"] = "Statut végétarien inconnu"
-    tag_names["vegan:yes"] = "Menu végétalien"
-    tag_names["vegan:only"] = "Entièrement végétalien"
-    tag_names["vegan:no"] = "Non végétalien"
-    tag_names["vegan:unknown"] = "Statut végétalien inconnu"
-    tag_names["wheelchair:yes"] = "Accessible aux fauteuils roulants"
-    tag_names["wheelchair:limited"] = "Accès limité aux fauteuils roulants"
-    tag_names["wheelchair:no"] = "Non accessible aux fauteuils roulants"
-    tag_names["wheelchair:unknown"] = "Statut des fauteuils roulants inconnu"
-    for tag in tag_names:
-        if tag in tags:
-            n = tags[tag]
-            output += (
-                '<input type="checkbox" checked '
-                'onchange="filter_results_handler(this)" '
-                'name="result_filter" id="filter_{tag}" value="{tag}">'
-                '<label for="filter_{tag}"> {label} <span class="badge">'
-                '{count}</span></label><br/>\n'
-            ).format(
-                tag=tag, label=tag_names[tag], count=tags[tag]
-            )
-    return html.format(count=count, content=output)
-
-def get_all_tags(results):
-    """
-        Returns a dict of all tags and their occurences from a list
-        of results.
-    """
-    tags_count = {}
+    tags = []
     for result in results:
-        result_tags = result.get_tags()
-        for tag in result_tags:
-            if tag in tags_count.keys():
-                tags_count[tag] += 1
-            else:
-                tags_count[tag] = 1
-    return tags_count
+        tags.extend(result.tags)
+    tags = OrderedDict(sorted(Counter(tags).items(), key=lambda t: t[0][2]))
+    if not tags:
+        return ''
+    
+    Tag = namedtuple("Tag", ["slug_name", "label", "count"])
+    renderable_tags = []
+    for tag, count in tags.items():
+        t = Tag(
+            slug_name=tag[0],
+            label=tag[1],
+            count=count,
+        )
+        renderable_tags.append(t)
+    
+    count = len(results)
+    html = render_to_string(
+        "search/filter_panel.part.html",
+        {
+            "tags": renderable_tags,
+            "count": count,
+        }
+    )
+    return html
 
 def parse_csv_data(result, csv_line, address_data):
     """
@@ -433,7 +398,8 @@ class Result:
                     )
                 )
                 self.opening_hours = None
-        self.tags = []
+        self.tags = self.get_tags()
+        self.renderable_tags = [t[0] for t in self.tags]
         return
     
     def get_address(self):
@@ -478,14 +444,36 @@ class Result:
             Returns a list of all tags present in the result.
         """
         tags = []
-        # Opening hours.
+        
+        # Specific tags.
+        for filter in self.search_preset.filters.all():
+            tag = filter.parse_result(self)
+            if tag:
+                tags.append(tag)
+        
+        # Universal tags.
+        # Uses three letters to order filters.
+        ## Opening hours.
         if self.opening_hours is not None:
             if self.opening_hours.is_open():
-                tags.append("open")
+                tags.append(("open", "Ouvert", 'AAA'))
             else:
-                tags.append("closed")
+                tags.append(("closed", "Fermé", 'AAB'))
         else:
-            tags.append("unknown_schedules")
+            tags.append(("unknown_schedules", "Horaires inconnues", 'AAC'))
+        
+        ## Wheelchairs.
+        wc = self.properties.get("wheelchair")
+        if wc:
+            if wc == "yes":
+                tags.append(("wheelchair:yes", "Accessible aux fauteuils roulants", 'ZBA'))
+            elif wc == "limited":
+                tags.append(("wheelchair:limited", "Accès limité aux fauteuils roulants", 'ZBB'))
+            elif wc == "no":
+                tags.append(("wheelchair:no", "Non accessible aux aux fauteuils roulants", 'ZBC'))
+        else:
+            tags.append(("wheelchair:unknown", "Accessibilité aux fauteuils roulants inconnue", 'ZBD'))
+        '''
         # Diet.
         diet = self.properties.get("diet:vegetarian")
         if diet:
@@ -507,18 +495,7 @@ class Result:
                 tags.append("vegetarian:no")
         else:
             tags.append("vegan:unknown")
-        # Wheelchairs.
-        wc = self.properties.get("wheelchair")
-        if wc:
-            if wc == "yes":
-                tags.append("wheelchair:yes")
-            elif wc == "limited":
-                tags.append("wheelchair:limited")
-            elif wc == "no":
-                tags.append("wheelchair:no")
-        else:
-            tags.append("wheelchair:unknown")
-        self.tags = tags
+        '''
         return tags
     
     def __str__(self):

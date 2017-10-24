@@ -3,7 +3,7 @@
 <div role="article" class="result-box" id="{{ result|render_anchor:'block' }}">
     {{ result|render_osm_link|safe }}
     {% if render_tags %}
-        <span class="result_tags" style="visibility:hidden" aria-hidden="true">{{ result.tags|join:';' }}</span>
+        <span class="result_tags" style="visibility:hidden" aria-hidden="true">{{ result.renderable_tags|join:';' }}</span>
     {% endif %}
     {% if result.properties|get_item:"name" %}
         {# Fixes the padding on the top of the box when there is no name. #}

@@ -54,6 +54,56 @@ def osm_keys_validator(field):
         i += 1
     return
 
+def filter_pr_validator(field):
+    """
+        The validator of the processing_rules field of SearchPreset.
+        Checks the field is correctly formated.
+        
+        Expected format:
+        key=value == tag == Description
+        * == unknown == Description  # This line should be the last one.
+    """
+    i = 1
+    for line in field.splitlines():
+        if len(line.split('==')) != 3:
+            raise ValidationError("Erreur ligne {}. Chaque ligne doit être de la forme 'key=value == tag == Description'.".format(i))
+        i += 1
+    return
+
+class Filter(models.Model):
+    """
+        A filter which can be used to show or hide results,
+        depending on their OSM tags. In case of multiple matches,
+        the first line wins.
+    """
+    name = models.CharField(max_length=50, verbose_name="Nom")
+    processing_rules = models.TextField(
+        blank=True, null=True, validators=[filter_pr_validator],
+        verbose_name="Règles de traitement"
+    )
+    
+    class Meta:
+        verbose_name = "Filtre"
+        verbose_name_plural = "Filtres"
+    
+    def parse_result(self, result):
+        """
+            Returns a tuple of the form "(tag, description)"
+            from a Result object.
+        """
+        for line in self.processing_rules.splitlines():
+            osm_tag, tag, description = [s.strip() for s in line.split('==')]
+            if not line.startswith('*'):
+                osm_key, osm_value = osm_tag.split('=', 1)
+                if osm_key in result.properties and result.properties[osm_key] == osm_value:
+                    return (tag, description, self.name)
+            else:
+                return (tag, description, self.name)
+        return None
+    
+    def __str__(self):
+        return self.name
+
 class SearchPreset(models.Model):
     """
         A search preset with all the stuff needed to display it nicely.
@@ -69,6 +119,10 @@ class SearchPreset(models.Model):
         blank=True, null=True,
         validators=[preset_pr_validator],
         verbose_name="Règles de traitement"
+    )
+    filters = models.ManyToManyField(
+        Filter,
+        related_name="search_presets"
     )
     
     class Meta:

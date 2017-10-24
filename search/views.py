@@ -197,7 +197,7 @@ def get_results(request):
     status = "error"
     err_msg = ''
     debug_msg = ''
-    tags_filter = ''
+    filter_panel = ''
     results = []
     try:
         results = utils.get_results(
@@ -206,7 +206,6 @@ def get_results(request):
         )
         utils.get_all_addresses(results)
         for result in results:
-            tags_count = utils.get_all_tags(results)
             result_block = render_to_string(
                 "search/result_block.part.html",
                 {
@@ -216,7 +215,7 @@ def get_results(request):
             )
             rendered_results.append('<li>' + result_block + '</li>')
         if results:
-            tags_filter = utils.render_tag_filter(tags_count, len(results))
+            filter_panel = utils.render_filter_panel(results)
         status = "ok"
         debug_logger.debug("Request successfull!")
     except geopy.exc.GeopyError as e:
@@ -255,7 +254,7 @@ def get_results(request):
         map_data.append((result.osm_meta, result.coordinates, result_str, marker_id))
     return HttpResponse(json.dumps({
             "status": status, "content": rendered_results,
-            "filters": tags_filter, "map_data": map_data,
+            "filters": filter_panel, "map_data": map_data,
             "err_msg": err_msg, "debug_msg": debug_msg
         }),
         content_type="application/json"
