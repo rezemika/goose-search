@@ -1,0 +1,534 @@
+# Goose English translation
+# Copyright (C) 2017 rezemika
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-10-24 19:02+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: rezemika\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: EN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: goose/settings.py:137
+msgid "Français"
+msgstr "French"
+
+#: goose/settings.py:138
+msgid "Anglais"
+msgstr "English"
+
+#: goose/settings.py:240
+msgid ""
+"Un moteur de recherche géographique léger utilisant OpenStreetMap pour "
+"chercher des points d'intérêt à proximité."
+msgstr ""
+"A lightweight geographic search engine using OpenStreetMap to search for "
+"points of interest nearby."
+
+#: search/forms.py:13
+msgid "Latitude"
+msgstr "Latitude"
+
+#: search/forms.py:21
+msgid "Longitude"
+msgstr "Longitude"
+
+#: search/forms.py:29
+msgid "Adresse estimée"
+msgstr "Estimated adress"
+
+#: search/forms.py:32
+msgid "entrer une adresse manuellement"
+msgstr "enter an address manually"
+
+#: search/forms.py:36
+msgid "Rayon de recherche"
+msgstr "Search radius"
+
+#: search/forms.py:37
+msgid "en mètres"
+msgstr "in meters"
+
+#: search/forms.py:46
+msgid "Votre recherche"
+msgstr "Your search"
+
+#: search/forms.py:52
+msgid "Écarter les résultats à accès privé ?"
+msgstr "Dismiss the results with private access?"
+
+#: search/forms.py:66
+msgid "Vous devez renseigner vos coordonnées GPS ou votre adresse actuelle."
+msgstr "You must fill in your GPS coordinates or your current address."
+
+#: search/forms.py:72
+msgid ""
+"Vous devez renseigner soit vos coordonnées GPS, soit votre adresse actuelle "
+"(mais pas les deux)."
+msgstr ""
+"You must fill in either your GPS coordinates or your current address (but "
+"not both)."
+
+#: search/forms.py:78
+msgid ""
+"Il manque la latitude ou la longitude dans les coordonnées GPS fournies. "
+"Vous pouvez alternativement fournir une adresse."
+msgstr ""
+"Latitude or the longitude are missing in the coordinates provided. You can "
+"alternatively provide an address."
+
+#: search/forms.py:96
+msgid ""
+"Les données renseignées n'ont pas permis de vous localiser. Vous pouvez "
+"essayer de la préciser, par exemple avec un code postal."
+msgstr ""
+"The provided data did not allowed to locate you. You can try to clarify it, "
+"for example with a postal code."
+
+#: search/models.py:32
+msgid ""
+"Erreur ligne {}. Le label et la clé doivent être entourés de guillemets (\") "
+"et séparés par deux points (:)"
+msgstr ""
+"Error line {}. The label and the key must be enclosed in quotation marks "
+"(\") and separated by a colon (:)"
+
+#: search/models.py:34
+msgid "Erreur ligne {}. Cette ligne ne correspond à aucun pattern valable"
+msgstr "Error line {}. This line does not match any valid pattern"
+
+#: search/models.py:40
+msgid ""
+"Erreur ligne {}. La clé et l'action doivent être séparés par une espace."
+msgstr "Error line {}. The key and the action must be separated by a space."
+
+#: search/models.py:42
+msgid "Erreur ligne {}. La clé est invalide."
+msgstr "Error line {}. The key is invalid."
+
+#: search/models.py:44
+msgid "Erreur ligne {}. L'action est invalide."
+msgstr "Error line {}. The action is invalid."
+
+#: search/models.py:54
+msgid ""
+"Erreur ligne {}. Chaque ligne doit être de la forme '\"key\"=\"value\"'."
+msgstr "Error line {}. Each line must of the form '\"key\"=\"value\"'."
+
+#: search/models.py:117
+msgid "Clés OpenStreetMap"
+msgstr "OpenStreetMap keys"
+
+#: search/models.py:122
+msgid "Règles de traitement"
+msgstr "Processing rules"
+
+#: search/models.py:130
+msgid "Point d'intérêt"
+msgstr "Point of interest"
+
+#: search/models.py:131
+msgid "Points d'intérêt"
+msgstr "Points of interest"
+
+#: search/templates/search/about.html:4
+msgid "Goose — À propos"
+msgstr "Goose — About"
+
+#: search/templates/search/about.html:7
+msgid "À propos de Goose"
+msgstr "About Goose"
+
+#: search/templates/search/about.html:9
+msgid ""
+"Ce site est un moteur de recherche géographique créé par rezemika. Ses "
+"résultats sont extraits des données d'OpenStreetMap sous la licence ODbL. Ce "
+"site est géré par le framework Django 1.10 avec Python3 et est stylisé avec "
+"Bootstrap 3. Il utilise aussi Javascript et jQuery 3 pour l'interactivité."
+msgstr ""
+"This site is a geographical search engine created by rezemika. Itsresults "
+"are extracted from the OpenStreetMap data under the ODbL license. Thissite "
+"is powered by the Django 1.10 framework with Python3 and is stylizedwith "
+"Bootstrap 3. It also uses jQuery 3 for interactivity."
+
+#. Translators: Followed by the acronym: Goose Offers an Openstreetmap Search Engine
+#: search/templates/search/about.html:11
+msgid ""
+"Son nom est un acronyme récursif : <i>Goose Offers an Openstreetmap Search "
+"Engine</i>."
+msgstr ""
+"Its name is a recursive acronym: <i>Goose Offers an Openstreetmap Search "
+"Engine</i>."
+
+#: search/templates/search/about.html:12
+#, python-format
+msgid ""
+"Goose est actuellement en version <b>%(VERSION.name)s</b>. Voici son dépôt "
+"Github : <a href=\"%(VERSION.github_url)s\">goose-search</a>."
+msgstr ""
+"Goose is currently in version <b>%(VERSION.name)s</b>. Here is its "
+"Github repository: <a href=\"%(VERSION.github_url)s\">goose-search</a>."
+
+#: search/templates/search/about.html:13
+msgid ""
+"Son logo provient quand à lui de <a href=\"https://www.freefavicon.com/"
+"freefavicons/animal/iconinfo/goose----152-248178.html\">freefavicon.com</a>."
+msgstr ""
+"Its logo comes from <a href=\"https://www.freefavicon.com/freefavicons/"
+"animal/iconinfo/goose----152-248178.html\">freefavicon.com</a>."
+
+#: search/templates/search/about.html:14
+msgid "Vie privée"
+msgstr "Privacy"
+
+#: search/templates/search/about.html:15
+msgid ""
+"Lors d'une recherche, Goose enregistre certaines informations à des fins "
+"statistiques. Ces informations sont : l'objet de la recherche, le rayon de "
+"recherche, ainsi que les coordonnées GPS arrondies au degré décimal. Ainsi, "
+"il est impossible de connaitre votre position à partir d'une requête faite "
+"sur Goose avec une précision meilleure que 130km environ (à la latitude de "
+"la France). Enfin, Goose n'utilise aucun outil ou script provenant de "
+"Google, Facebook ou Twitter."
+msgstr ""
+"When searching, Goose records some information forstatistical purposes. This "
+"information is: the object of the search, the radius ofsearch, as well as "
+"the GPS coordinates rounded to the decimal degree. So,it is impossible to "
+"know your position from a query madeon Goose with a precision better than "
+"about 130km (at the latitude of France.) Finally, Goose does not use any "
+"tool or script from Google, Facebook or Twitter."
+
+#: search/templates/search/filter_panel.part.html:7
+#, fuzzy
+#| msgid "Pas de résultats."
+msgid "Filtrer les résultats"
+msgstr "No results."
+
+#: search/templates/search/home.html:7
+msgid ""
+"Goose est un outil de recherche géographique. Vous pouvez entrer vos "
+"coordonnées GPS avec le bouton \"Me localiser\" ou entrer une adresse. "
+"Choisissez le sujet de votre recherche, le rayon (en mètres) et cliquez sur "
+"\"Envoyer\". La requête peut prendre un certain temps."
+msgstr ""
+"Goose is a geographical search engine. You can enter your GPS coordinates "
+"with the \"Locate me\" button or enter an address. Choose the subject of "
+"your search, the radius (in meters) and click on \"Send\". The query may "
+"take some time."
+
+#: search/templates/search/home.html:18
+msgid "Me localiser"
+msgstr "Locate me"
+
+#: search/templates/search/home.html:19
+msgid "Envoyer"
+msgstr "Send"
+
+#: search/templates/search/home.html:41 templates/base.html:50
+msgid "Langue"
+msgstr "Language"
+
+#: search/templates/search/light_results.html:6
+msgid "Goose Light — Résultats de recherche"
+msgstr "Goose — Search results"
+
+#: search/templates/search/light_results.html:9
+#: search/templates/search/results.html:9
+msgid "Résultats de la recherche"
+msgstr "Search results"
+
+#: search/templates/search/light_results.html:11
+#: search/templates/search/results.html:11
+msgid "Voici votre localisation estimée :"
+msgstr "Here is your estimated location:"
+
+#: search/templates/search/light_results.html:13
+#: search/templates/search/results.html:13
+msgid "Latitude : "
+msgstr "Latitude: "
+
+#: search/templates/search/light_results.html:14
+#: search/templates/search/results.html:14
+msgid "Longitude : "
+msgstr "Longitude: "
+
+#: search/templates/search/light_results.html:15
+#: search/templates/search/results.html:15
+msgid "Adresse : "
+msgstr "Address: "
+
+#: search/templates/search/light_results.html:17
+msgid "Recherche : "
+msgstr "Search: "
+
+#: search/templates/search/light_results.html:17
+#: search/templates/search/results.html:18
+msgid "Cette recherche utilise un permalien."
+msgstr "This search uses a permalink."
+
+#: search/templates/search/light_results.html:18
+#: search/templates/search/results.html:20
+msgid ""
+"Les résultats sont triés par ordre croissant de distance par rapport à votre "
+"position. Les liens de guidage sont prévus pour des piétons."
+msgstr ""
+"The results are sorted in ascending order of distance from your position. "
+"Guidance links are provided for pedestrians."
+
+#: search/templates/search/light_results.html:20
+#: search/templates/search/results.html:23
+msgid "Permalien vers cette recherche : "
+msgstr "Permalink to this search: "
+
+#: search/templates/search/light_results.html:24
+#: search/templates/search/results.html:26
+msgid "Nouvelle recherche"
+msgstr "New search"
+
+#: search/templates/search/light_results.html:26
+#, python-format
+msgid "%(count)s résultat%(plural)s"
+msgstr "%(count)s result%(plural)s"
+
+#: search/templates/search/light_results.html:35 search/views.py:229
+msgid "Pas de résultats."
+msgstr "No results."
+
+#: search/templates/search/marker_popup.part.html:15
+#: search/templates/search/result_block.part.html:24 search/utils.py:495
+msgid "Ouvert"
+msgstr "Open"
+
+#: search/templates/search/marker_popup.part.html:17
+#: search/templates/search/result_block.part.html:26 search/utils.py:497
+msgid "Fermé"
+msgstr "Closed"
+
+#: search/templates/search/marker_popup.part.html:23
+#: search/templates/search/result_block.part.html:31
+#, python-format
+msgid "Distance : %(distance)s mètres"
+msgstr "Distance: %(distance)s meters"
+
+#: search/templates/search/marker_popup.part.html:24
+#: search/templates/search/result_block.part.html:32
+#, python-format
+msgid "Direction : %(bearing)s° %(direction)s"
+msgstr "Direction: %(bearing)s° %(direction)s"
+
+#: search/templates/search/marker_popup.part.html:28
+#: search/templates/search/result_block.part.html:38 search/utils.py:505
+msgid "Téléphone : "
+msgstr "Phone: "
+
+#: search/templates/search/result_block.part.html:12
+msgid "Nom : "
+msgstr "Name: "
+
+#: search/templates/search/result_block.part.html:42
+msgid "Site web : "
+msgstr "Website: "
+
+#: search/templates/search/results.html:6
+msgid "Goose — Résultats de recherche"
+msgstr "Goose — Search results"
+
+#: search/templates/search/results.html:18
+#, python-format
+msgid "Recherche : %(search_description)s"
+msgstr "Search: %(search_description)s"
+
+#: search/templates/search/results.html:30
+msgid "Charger la carte"
+msgstr "Load the map"
+
+#: search/templates/search/results.html:72
+msgid ""
+"<a href=\\\"https://leafletjs.com/\\\">&copy; Les contributeurs d’<a href=\\"
+"\"https://osm.org/copyright\\\">OpenStreetMap</a>"
+msgstr ""
+"<a href=\\\"https://leafletjs.com/\\\">&copy; <a href=\\\"https://osm.org/"
+"copyright\\\">OpenStreetMap contributors</a>"
+
+#: search/templates/search/results.html:102
+msgid "Recherche…"
+msgstr "Searching…"
+
+#: search/utils.py:259
+#, python-brace-format
+msgid "Adresse estimée : {housenumber} {street}, {postcode} {city}"
+msgstr "Estimated address : {housenumber} {street}, {city} {postcode}"
+
+#: search/utils.py:272
+#, python-brace-format
+msgid "Adresse estimée : {housenumber} {street}"
+msgstr "Estimated address : {housenumber} {street}"
+
+#: search/utils.py:289
+msgid "Adresse estimée : {}"
+msgstr "Estimated address : {}"
+
+#: search/utils.py:422
+msgid "Adresse : Adresse inconnue"
+msgstr "Adress: Unknown"
+
+#: search/utils.py:432
+#, python-brace-format
+msgid "Adresse exacte : {housenumber} {street}, {postcode} {city}"
+msgstr "Exact address : {housenumber} {street}, {city} {postcode}"
+
+#: search/utils.py:439
+#, python-brace-format
+msgid "Adresse exacte : {housenumber}, {street}"
+msgstr "Exact address : {housenumber} {street}"
+
+#: search/utils.py:492
+msgid "Nom : {}"
+msgstr "Name: {}"
+
+#: search/utils.py:498
+#, python-brace-format
+msgid "Distance : {distance} mètres"
+msgstr "Distance: {distance} meters"
+
+#: search/utils.py:499
+#, python-brace-format
+msgid "Direction : {degrees}° {direction}"
+msgstr "Direction: {degrees}° {direction}"
+
+#: search/utils.py:522
+msgid "Horaires d'ouverture"
+msgstr "Opening hours"
+
+#: search/utils.py:557
+msgid "Itinéraire jusqu'à ce point"
+msgstr "Itinerary to this point"
+
+#: search/views.py:71 search/views.py:331
+msgid "L'ID de l'objet de votre recherche est invalide."
+msgstr "The object ID of your search is invalid."
+
+#: search/views.py:79 search/views.py:339
+msgid "Vos coordonnées sont invalides."
+msgstr "Your coordinates are invalid."
+
+#: search/views.py:93 search/views.py:353
+msgid "Adresse inconnue"
+msgstr "Unknown adress"
+
+#: search/views.py:98 search/views.py:357
+msgid "Vos coordonnées n'ont pas permis de trouver votre adresse actuelle."
+msgstr "Your coordinates have not helped to find your current address."
+
+#: search/views.py:110 search/views.py:369
+msgid "Le rayon de recherche demandé est invalide."
+msgstr "The requested search radius is invalid."
+
+#: search/views.py:126 search/views.py:386
+#, python-brace-format
+msgid ""
+"\"{search_preset}\" dans un rayon de {radius} mètres. Exclusion des "
+"résultats à accès privé."
+msgstr ""
+"\"{search_preset}\" within a radius of {radius} meters. Exclusion of private "
+"access results."
+
+#: search/views.py:131 search/views.py:391
+#, python-brace-format
+msgid ""
+"\"{search_preset}\" dans un rayon de {radius} mètres. Inclusion des "
+"résultats à accès privé."
+msgstr ""
+"\"{search_preset}\" within a radius of {radius} meters. Inclusion of private "
+"access results."
+
+#: search/views.py:138 search/views.py:398
+msgid "Paramètres invalides."
+msgstr "Invalid parameters."
+
+#: search/views.py:143 search/views.py:402
+msgid ""
+"Trop de requêtes ont été faites en trop peu de temps. Merci d'attendre "
+"quelques secondes avant de raffraichir la page."
+msgstr ""
+"Too many requests were made in too little time. Please waita few seconds "
+"before refreshing the page."
+
+#: search/views.py:174 templates/500.html:5
+msgid "Erreur 500"
+msgstr "Error 500"
+
+#: search/views.py:176
+msgid "Désolé, une erreur non prise en charge s'est produite."
+msgstr "Sorry, an unsupported error has occurred."
+
+#: search/views.py:232 search/views.py:428
+msgid ""
+"Une erreur s'est produite lors de l'acquisition de vos coordonnées. Vous "
+"pouvez essayer de recharger la page dans quelques instants."
+msgstr ""
+"An error occurred while acquiring your position, you can try to reload the "
+"page in a few moments."
+
+#: search/views.py:240 search/views.py:436
+msgid ""
+"Une erreur s'est produite lors de la requête vers les serveurs "
+"d'OpenStreetMap. Vous pouvez essayer de recharger la page dans quelques "
+"instants."
+msgstr ""
+"An error occurred while querying to OpenStreetMap servers. You can try to "
+"reload the page in a few moments."
+
+#: search/views.py:247 search/views.py:443
+msgid "Une erreur non prise en charge s'est produite."
+msgstr "Sorry, an unsupported error has occurred."
+
+#: templates/404.html:5
+msgid "Erreur 404"
+msgstr "Error 404"
+
+#: templates/404.html:7
+msgid "Désolé, la page que vous cherchiez ne se trouve pas (ou plus) ici."
+msgstr "Sorry, the page you are looking for was not found here."
+
+#: templates/500.html:7
+msgid ""
+"Une erreur côté serveur s'est produite. N'hésitez pas à aller voir sur "
+"Github si ce problème est connu, et à créer un ticket si besoin. Merci !"
+msgstr ""
+"A server-side error occurred. Do not hesitate to see on Github if this "
+"problem is known, and to create an issue if necessary. Thank you!"
+
+#: templates/base.html:26
+msgid "Navigation"
+msgstr "Navigation"
+
+#: templates/base.html:39
+msgid "Recherche"
+msgstr "Search"
+
+#: templates/base.html:40
+msgid "Light"
+msgstr "Light"
+
+#: templates/base.html:41 templates/base_light.html:18
+msgid "À propos"
+msgstr "About"
+
+#: templates/base.html:42
+msgid "Administration"
+msgstr "Admin"
+
+#: templates/base_light.html:17
+msgid "Recherche light"
+msgstr "Light search"
+
+#: templates/base_light.html:19
+msgid "Version classique"
+msgstr "Regular version"
