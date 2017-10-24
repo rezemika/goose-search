@@ -132,10 +132,9 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'locale/'),
 )
 
-gettext = lambda s: s
 LANGUAGES = (
-    ("fr", gettext("Français")),
-    ("en", gettext("Anglais")),
+    ("fr", _("Français")),
+    ("en", _("Anglais")),
 )
 
 

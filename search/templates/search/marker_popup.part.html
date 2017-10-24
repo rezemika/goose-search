@@ -1,4 +1,5 @@
 {% load geo_extras %}
+{% load i18n %}
 
 <div name="#{{ result|render_anchor:'map' }}">
     {% if result.properties|get_item:"name" %}<span class="center">{{ result.properties.name|escape }}</span>{% endif %}
@@ -11,20 +12,20 @@
     {% if result.opening_hours %}
         <p>
         {% if result.opening_hours.is_open %}
-            <b>Ouvert</b>
+            <b>{% trans "Ouvert" %}</b>
         {% else %}
-            <b>Fermé</b>
+            <b>{% trans "Fermé" %}</b>
         {% endif %}
         <br/></p>
     {% endif %}
     <p>{{ result.get_address }}</p>
     <p>
-        Distance : {{ result.distance }} mètres<br/>
-        Direction : {{ result.bearing }}° {{ result.direction }}<br/>
+        {% blocktrans with distance=result.distance %}Distance : {{ distance }} mètres{% endblocktrans %}<br/>
+        {% blocktrans with bearing=result.bearing direction=result.direction %}Direction : {{ bearing }}° {{ direction }}{% endblocktrans %}<br/>
     </p>
     {% if result.properties|get_item:"phone" %}
         <span class="glyphicon glyphicon-phone-alt inline-icon" aria-hidden="true"></span>
-        Téléphone : <a href="tel:{{ result.properties.phone }}">{{ result.properties.phone|escape }}</a><br/>
+        {% trans "Téléphone : " %}<a href="tel:{{ result.properties.phone }}">{{ result.properties.phone|escape }}</a><br/>
     {% endif %}
     {% with properties=result|render_properties %}
         {% if properties %}
