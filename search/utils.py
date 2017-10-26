@@ -465,13 +465,13 @@ class Result:
         wc = self.properties.get("wheelchair")
         if wc:
             if wc == "yes":
-                tags.append(("wheelchair:yes", "Accessible aux fauteuils roulants", 'ZBA'))
+                tags.append(("wheelchair_yes", "Accessible aux fauteuils roulants", 'ZBA'))
             elif wc == "limited":
-                tags.append(("wheelchair:limited", "Accès limité aux fauteuils roulants", 'ZBB'))
+                tags.append(("wheelchair_limited", "Accès limité aux fauteuils roulants", 'ZBB'))
             elif wc == "no":
-                tags.append(("wheelchair:no", "Non accessible aux aux fauteuils roulants", 'ZBC'))
+                tags.append(("wheelchair_no", "Non accessible aux aux fauteuils roulants", 'ZBC'))
         else:
-            tags.append(("wheelchair:unknown", "Accessibilité aux fauteuils roulants inconnue", 'ZBD'))
+            tags.append(("wheelchair_unknown", "Accessibilité aux fauteuils roulants inconnue", 'ZBD'))
         return tags
     
     def render(self, render_tags=True, link_to_osm=True, opening_hours=True, oh_in_popover=True, itinerary=True):

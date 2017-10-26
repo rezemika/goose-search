@@ -1,25 +1,25 @@
 function load_map(startCoordinates, startZoom, userCoords, youAreHereMsg, mapCopyright) {
     console.log("Loading the map.");
-    results_map = L.map("leaflet-map", {
+    window.map = L.map("leaflet-map", {
         // See https://github.com/Leaflet/Leaflet.fullscreen
         fullscreenControl: true,
     }).setView(startCoordinates, startZoom);
     L.tileLayer("http://{s}.tile.osm.org/{z}/{x}/{y}.png", {
         attribution: mapCopyright
-    }).addTo(results_map);
+    }).addTo(window.map);
     
     console.log("Completed. Adding markers.");
-    var all_markers = new L.FeatureGroup();
-    map_results.forEach(function(result) {
+    var allMarkers = new L.FeatureGroup();
+    window.map_results.forEach(function(result) {
         marker_coords = [result[1][0], result[1][1]];
         marker = new L.marker(marker_coords, {result_id: result[3]});
         marker.bindPopup('');
         var popup = marker.getPopup();
         popup.setContent(result[2]);
-        all_markers.addLayer(marker);
+        allMarkers.addLayer(marker);
     });
-    results_map.addLayer(all_markers);
-    window.all_markers = all_markers;
+    window.allMarkers = allMarkers;
+    window.map.addLayer(allMarkers);
     
     console.log("Completed. Adding the 'You are here' red marker.");
     var redIcon = new L.Icon({
@@ -34,21 +34,15 @@ function load_map(startCoordinates, startZoom, userCoords, youAreHereMsg, mapCop
     var user_marker = new L.marker([
         userCoords[0],
         userCoords[1]
-    ], {icon: redIcon}).addTo(results_map);
+    ], {icon: redIcon}).addTo(window.map);
     user_marker.bindPopup(youAreHereMsg);
     
     console.log("Adapting the size of the map to the size of the screen.");
-    // Does not work yet (bugged).
-    //results_map.fitBounds(all_markers.getBounds());
-    if (map_results.length > 0) {
-        results_map.setView(all_markers.getBounds().getCenter(), startZoom);
-    }
-    else {
-        results_map.setView(userCoords, startZoom);
-    }
-    
+    window.map.fitBounds(allMarkers.getBounds());
+    L.control.scale().addTo(window.map);
+    window.map.setZoom(startZoom);
     $("#map-collapse").on("shown.bs.collapse", function() {
-        results_map.invalidateSize();
+        window.map.invalidateSize();
     });
     // Opens the map.
     $("#map-collapse").collapse("show")
@@ -59,19 +53,19 @@ function update_map_size() {
     box_height = $(window).height() * 0.75;
     box_width = ($("#map-panel").width() * 0.9) + 10;
     $("#leaflet-map").height(box_height).width(box_width);
-    results_map.invalidateSize();
+    window.map.invalidateSize();
 }
 
-function see_on_map(marker_id) {
-    console.log("Searching for ID " + marker_id);
-    window.all_markers.eachLayer(function(marker){
-        if (marker.options.result_id == marker_id) {
+function see_on_map(markerId) {
+    console.log("Searching for ID " + markerId);
+    window.allMarkers.eachLayer(function(marker){
+        if (marker.options.result_id == markerId) {
             console.log("Found ! ID : " + marker.options.result_id);
             marker.openPopup();
-            $("#map-collapse").collapse("show")
+            $("#map-collapse").collapse("show");
             $(document).scrollTop($("#map-collapse").offset().top);
-            return
+            return;
         }
     });
-    console.log("Error : ID " + marker_id + " not found!");
+    console.log("Error : ID " + markerId + " not found!");
 }
