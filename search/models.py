@@ -123,7 +123,8 @@ class SearchPreset(models.Model):
     )
     filters = models.ManyToManyField(
         Filter,
-        related_name="search_presets"
+        related_name="search_presets",
+        blank=True
     )
     
     class Meta:
