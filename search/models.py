@@ -67,7 +67,7 @@ def filter_pr_validator(field):
     i = 1
     for line in field.splitlines():
         if len(line.split('==')) != 3:
-            raise ValidationError("Erreur ligne {}. Chaque ligne doit être de la forme 'key=value == tag == Description'.".format(i))
+            raise ValidationError(_("Erreur ligne {}. Chaque ligne doit être de la forme 'key=value == tag == Description'.").format(i))
         i += 1
     return
 
@@ -77,15 +77,15 @@ class Filter(models.Model):
         depending on their OSM tags. In case of multiple matches,
         the first line wins.
     """
-    name = models.CharField(max_length=50, verbose_name="Nom")
+    name = models.CharField(max_length=50, verbose_name=_("Nom"))
     processing_rules = models.TextField(
         blank=True, null=True, validators=[filter_pr_validator],
-        verbose_name="Règles de traitement"
+        verbose_name=_("Règles de traitement")
     )
     
     class Meta:
-        verbose_name = "Filtre"
-        verbose_name_plural = "Filtres"
+        verbose_name = _("Filtre")
+        verbose_name_plural = _("Filtres")
     
     def parse_result(self, result):
         """

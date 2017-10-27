@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-27 13:47+0200\n"
+"POT-Creation-Date: 2017-10-27 16:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: rezemika\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -121,19 +121,43 @@ msgid ""
 "Erreur ligne {}. Chaque ligne doit être de la forme '\"key\"=\"value\"'."
 msgstr "Error line {}. Each line must of the form '\"key\"=\"value\"'."
 
+#: search/models.py:70
+#, fuzzy
+#| msgid ""
+#| "Erreur ligne {}. Chaque ligne doit être de la forme '\"key\"=\"value\"'."
+msgid ""
+"Erreur ligne {}. Chaque ligne doit être de la forme 'key=value == tag == "
+"Description'."
+msgstr "Error line {}. Each line must of the form 'key=value == tag == "
+"Description'."
+
+#: search/models.py:80
+#, fuzzy
+#| msgid "Nom : "
+msgid "Nom"
+msgstr "Name: "
+
+#: search/models.py:83 search/models.py:122
+msgid "Règles de traitement"
+msgstr "Processing rules"
+
+#: search/models.py:87
+msgid "Filtre"
+msgstr "Filter"
+
+#: search/models.py:88
+msgid "Filtres"
+msgstr "Filters"
+
 #: search/models.py:117
 msgid "Clés OpenStreetMap"
 msgstr "OpenStreetMap keys"
 
-#: search/models.py:122
-msgid "Règles de traitement"
-msgstr "Processing rules"
-
-#: search/models.py:130
+#: search/models.py:131
 msgid "Point d'intérêt"
 msgstr "Point of interest"
 
-#: search/models.py:131
+#: search/models.py:132
 msgid "Points d'intérêt"
 msgstr "Points of interest"
 
