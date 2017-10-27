@@ -11,6 +11,7 @@ Goose — Un moteur de recherche géographique utilisant OpenStreetMap
 - Affichage des propriétés des résultat modifiable selon la recherche effectuée.
 - Version ultralégère (Goose Light), proposant des pages épurées (environ 25Ko pour 15 résultats).
 - Permaliens de recherche, permettant refaire une même recherche sans re-remplir le formulaire.
+- Carte des résultats avec [Leaflet](http://leafletjs.com/).
 
 # Installation
 
@@ -20,6 +21,7 @@ Goose — Un moteur de recherche géographique utilisant OpenStreetMap
 - Installer les dépendances : `make install-back`
 - Faire les migrations : `make migrate`
 - Collecter les fichiers statiques : `make collectstatic`
+- Compiler les fichiers de traduction (`.po`) : `python3 manage.py compilemessages -l <LANG>`
 - Générer une nouvelle SECRET_KEY : `make new-secret-key`
 - Charger les "données d’usine" : `make load-factory-data`
 - Lancer les tests unitaires : `make test`
