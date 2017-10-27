@@ -1,14 +1,9 @@
-# -*- coding: utf-8 -*-
-#
 #  Loads data in DB to allow rapid testing.
-#  
-#  Published under the AGPLv3 license by rezemika.
-#  
 
 from django.core.management.base import BaseCommand, CommandError
 from django.db import IntegrityError
 from django.contrib.auth.models import User
-from search.models import SearchPreset
+from search.models import SearchPreset, Filter
 
 class Command(BaseCommand):
     help = "Loads data in DB to allow rapid testing"
@@ -47,6 +42,22 @@ class Command(BaseCommand):
             osm_keys='"amenity"="drinking_water"\n"drinking_water"="yes"'
         )
         sp4.save()
+        sp5 = SearchPreset(
+            name="Restaurants et cafés",
+            osm_keys='"amenity"="restaurant"\n"amenity"="cafe"'
+        )
+        sp5.save()
+        # Creates two filters.
+        f1 = Filter(
+            name="Statut végétarien",
+            processing_rules="diet:vegetarian=yes == vegetarian_yes == Menu végétarien\ndiet:vegetarian=only == vegetarian_only == Entièrement végétarien\ndiet:vegetarian=no == vegetarian_no == Non végétarien\n* == vegetarian_unknown == Statut végétarien inconnu"
+        )
+        f1.save()
+        f2 = Filter(
+            name="Tarif",
+            processing_rules="fee=yes == paying == Payant\nfee=no == free == Gratuit\n* == fee_unknown == Prix inconnu"
+        )
+        f2.save()
         self.stdout.write(self.style.SUCCESS("Données de test correctement chargées !"))
         return
 
