@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-24 19:02+0200\n"
+"POT-Creation-Date: 2017-10-27 13:47+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: rezemika\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,15 +15,15 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: goose/settings.py:137
+#: goose/settings.py:136
 msgid "Français"
 msgstr "French"
 
-#: goose/settings.py:138
+#: goose/settings.py:137
 msgid "Anglais"
 msgstr "English"
 
-#: goose/settings.py:240
+#: goose/settings.py:239
 msgid ""
 "Un moteur de recherche géographique léger utilisant OpenStreetMap pour "
 "chercher des points d'intérêt à proximité."
@@ -172,8 +172,8 @@ msgid ""
 "Goose est actuellement en version <b>%(VERSION.name)s</b>. Voici son dépôt "
 "Github : <a href=\"%(VERSION.github_url)s\">goose-search</a>."
 msgstr ""
-"Goose is currently in version <b>%(VERSION.name)s</b>. Here is its "
-"Github repository: <a href=\"%(VERSION.github_url)s\">goose-search</a>."
+"Goose is currently in version <b>%(VERSION.name)s</b>. Here is its Github "
+"repository: <a href=\"%(VERSION.github_url)s\">goose-search</a>."
 
 #: search/templates/search/about.html:13
 msgid ""
@@ -296,17 +296,17 @@ msgstr "New search"
 msgid "%(count)s résultat%(plural)s"
 msgstr "%(count)s result%(plural)s"
 
-#: search/templates/search/light_results.html:35 search/views.py:229
+#: search/templates/search/light_results.html:35 search/views.py:236
 msgid "Pas de résultats."
 msgstr "No results."
 
 #: search/templates/search/marker_popup.part.html:15
-#: search/templates/search/result_block.part.html:24 search/utils.py:495
+#: search/templates/search/result_block.part.html:24 search/utils.py:490
 msgid "Ouvert"
 msgstr "Open"
 
 #: search/templates/search/marker_popup.part.html:17
-#: search/templates/search/result_block.part.html:26 search/utils.py:497
+#: search/templates/search/result_block.part.html:26 search/utils.py:492
 msgid "Fermé"
 msgstr "Closed"
 
@@ -323,7 +323,7 @@ msgid "Direction : %(bearing)s° %(direction)s"
 msgstr "Direction: %(bearing)s° %(direction)s"
 
 #: search/templates/search/marker_popup.part.html:28
-#: search/templates/search/result_block.part.html:38 search/utils.py:505
+#: search/templates/search/result_block.part.html:38 search/utils.py:500
 msgid "Téléphone : "
 msgstr "Phone: "
 
@@ -348,6 +348,10 @@ msgstr "Search: %(search_description)s"
 msgid "Charger la carte"
 msgstr "Load the map"
 
+#: search/templates/search/results.html:71
+msgid "Vous êtes ici."
+msgstr "You are here."
+
 #: search/templates/search/results.html:72
 msgid ""
 "<a href=\\\"https://leafletjs.com/\\\">&copy; Les contributeurs d’<a href=\\"
@@ -360,77 +364,77 @@ msgstr ""
 msgid "Recherche…"
 msgstr "Searching…"
 
-#: search/utils.py:259
+#: search/utils.py:257
 #, python-brace-format
 msgid "Adresse estimée : {housenumber} {street}, {postcode} {city}"
 msgstr "Estimated address : {housenumber} {street}, {city} {postcode}"
 
-#: search/utils.py:272
+#: search/utils.py:270
 #, python-brace-format
 msgid "Adresse estimée : {housenumber} {street}"
 msgstr "Estimated address : {housenumber} {street}"
 
-#: search/utils.py:289
+#: search/utils.py:287
 msgid "Adresse estimée : {}"
 msgstr "Estimated address : {}"
 
-#: search/utils.py:422
+#: search/utils.py:417
 msgid "Adresse : Adresse inconnue"
 msgstr "Adress: Unknown"
 
-#: search/utils.py:432
+#: search/utils.py:427
 #, python-brace-format
 msgid "Adresse exacte : {housenumber} {street}, {postcode} {city}"
 msgstr "Exact address : {housenumber} {street}, {city} {postcode}"
 
-#: search/utils.py:439
+#: search/utils.py:434
 #, python-brace-format
 msgid "Adresse exacte : {housenumber}, {street}"
 msgstr "Exact address : {housenumber} {street}"
 
-#: search/utils.py:492
+#: search/utils.py:487
 msgid "Nom : {}"
 msgstr "Name: {}"
 
-#: search/utils.py:498
+#: search/utils.py:493
 #, python-brace-format
 msgid "Distance : {distance} mètres"
 msgstr "Distance: {distance} meters"
 
-#: search/utils.py:499
+#: search/utils.py:494
 #, python-brace-format
 msgid "Direction : {degrees}° {direction}"
 msgstr "Direction: {degrees}° {direction}"
 
-#: search/utils.py:522
+#: search/utils.py:517
 msgid "Horaires d'ouverture"
 msgstr "Opening hours"
 
-#: search/utils.py:557
+#: search/utils.py:552
 msgid "Itinéraire jusqu'à ce point"
 msgstr "Itinerary to this point"
 
-#: search/views.py:71 search/views.py:331
+#: search/views.py:73 search/views.py:338
 msgid "L'ID de l'objet de votre recherche est invalide."
 msgstr "The object ID of your search is invalid."
 
-#: search/views.py:79 search/views.py:339
+#: search/views.py:81 search/views.py:346
 msgid "Vos coordonnées sont invalides."
 msgstr "Your coordinates are invalid."
 
-#: search/views.py:93 search/views.py:353
+#: search/views.py:95 search/views.py:360
 msgid "Adresse inconnue"
 msgstr "Unknown adress"
 
-#: search/views.py:98 search/views.py:357
+#: search/views.py:100 search/views.py:364
 msgid "Vos coordonnées n'ont pas permis de trouver votre adresse actuelle."
 msgstr "Your coordinates have not helped to find your current address."
 
-#: search/views.py:110 search/views.py:369
+#: search/views.py:112 search/views.py:376
 msgid "Le rayon de recherche demandé est invalide."
 msgstr "The requested search radius is invalid."
 
-#: search/views.py:126 search/views.py:386
+#: search/views.py:128 search/views.py:393
 #, python-brace-format
 msgid ""
 "\"{search_preset}\" dans un rayon de {radius} mètres. Exclusion des "
@@ -439,7 +443,7 @@ msgstr ""
 "\"{search_preset}\" within a radius of {radius} meters. Exclusion of private "
 "access results."
 
-#: search/views.py:131 search/views.py:391
+#: search/views.py:133 search/views.py:398
 #, python-brace-format
 msgid ""
 "\"{search_preset}\" dans un rayon de {radius} mètres. Inclusion des "
@@ -448,11 +452,11 @@ msgstr ""
 "\"{search_preset}\" within a radius of {radius} meters. Inclusion of private "
 "access results."
 
-#: search/views.py:138 search/views.py:398
+#: search/views.py:140 search/views.py:405
 msgid "Paramètres invalides."
 msgstr "Invalid parameters."
 
-#: search/views.py:143 search/views.py:402
+#: search/views.py:145 search/views.py:409
 msgid ""
 "Trop de requêtes ont été faites en trop peu de temps. Merci d'attendre "
 "quelques secondes avant de raffraichir la page."
@@ -460,15 +464,15 @@ msgstr ""
 "Too many requests were made in too little time. Please waita few seconds "
 "before refreshing the page."
 
-#: search/views.py:174 templates/500.html:5
+#: search/views.py:176 templates/500.html:5
 msgid "Erreur 500"
 msgstr "Error 500"
 
-#: search/views.py:176
+#: search/views.py:178
 msgid "Désolé, une erreur non prise en charge s'est produite."
 msgstr "Sorry, an unsupported error has occurred."
 
-#: search/views.py:232 search/views.py:428
+#: search/views.py:239 search/views.py:441
 msgid ""
 "Une erreur s'est produite lors de l'acquisition de vos coordonnées. Vous "
 "pouvez essayer de recharger la page dans quelques instants."
@@ -476,7 +480,7 @@ msgstr ""
 "An error occurred while acquiring your position, you can try to reload the "
 "page in a few moments."
 
-#: search/views.py:240 search/views.py:436
+#: search/views.py:247 search/views.py:449
 msgid ""
 "Une erreur s'est produite lors de la requête vers les serveurs "
 "d'OpenStreetMap. Vous pouvez essayer de recharger la page dans quelques "
@@ -485,7 +489,7 @@ msgstr ""
 "An error occurred while querying to OpenStreetMap servers. You can try to "
 "reload the page in a few moments."
 
-#: search/views.py:247 search/views.py:443
+#: search/views.py:254 search/views.py:456
 msgid "Une erreur non prise en charge s'est produite."
 msgstr "Sorry, an unsupported error has occurred."
 

@@ -68,7 +68,7 @@
                         startCoordinates = [46.495, 2.207];
                         startZoom = 15;
                         userCoords = [{{ user_coords.0|safe }}, {{ user_coords.1|safe }}];
-                        youAreHereMsg = "Vous êtes ici.";
+                        youAreHereMsg = "{% trans 'Vous êtes ici.' %}";
                         mapCopyright = "{% trans '<a href=\"https://leafletjs.com/\">&copy; Les contributeurs d’<a href=\"https://osm.org/copyright\">OpenStreetMap</a>' %}";
                         var results_map = load_map(startCoordinates, startZoom, userCoords, youAreHereMsg, mapCopyright);
                         update_map_size();
