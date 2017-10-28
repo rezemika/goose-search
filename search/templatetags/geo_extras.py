@@ -1,5 +1,6 @@
 from django import template
 import logging
+from django.utils.translation import ugettext as _
 
 register = template.Library()
 
@@ -21,14 +22,15 @@ def render_opening_hours(result, popover):
         )
         return ''
     if popover:
+        title = _("Horaires d'ouverture")
         oh_content = """\
             <button type="button" class="btn btn-default"\
-             data-toggle="popover" title="Horaires d\'ouverture"\
-             data-content="{}" data-html="true"\
+             data-toggle="popover" title="{title}"\
+             data-content="{content}" data-html="true"\
              data-placement="right">\
             <span class="glyphicon glyphicon-time inline-icon"\
-             aria-hidden="true"></span>Horaires d'ouverture</button>\
-        """.format(oh_text)
+             aria-hidden="true"></span>{title}</button>\
+        """.format(title=title, content=oh_text)
     else:
         oh_content = '<div class="small-box">{}</div>'.format(oh_text)
     return oh_content
@@ -46,10 +48,11 @@ def render_address_link(result):
         result.user_coords[0], result.user_coords[1],
         result.coordinates[0], result.coordinates[1]
     )
+    title = _("Itinéraire jusqu'à ce point")
     return """\
-        <a href="{}"><span class="glyphicon glyphicon-road inline-icon \"
-        aria-hidden="true"></span>Itinéraire jusqu'à ce point</a>\
-    """.format(itinerary_url)
+        <a href="{link}"><span class="glyphicon glyphicon-road inline-icon \"
+        aria-hidden="true"></span>{title}</a>\
+    """.format(title=title, link=itinerary_url)
 
 @register.filter()
 def render_osm_link(result):
@@ -57,10 +60,11 @@ def render_osm_link(result):
         result.osm_meta[0],
         result.osm_meta[1]
     )
+    alt = _("Lien OSM")
     return """\
-        <a href="{}"><img class="osm-link-logo" \
-        src="/static/images/osm_logo.png" alt="Lien OSM"></a>\
-    """.format(osm_link)
+        <a href="{link}"><img class="osm-link-logo" \
+        src="/static/images/osm_logo.png" alt="{alt}"></a>\
+    """.format(link=osm_link, alt=alt)
 
 @register.filter()
 def render_coordinate(coord):

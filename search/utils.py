@@ -455,23 +455,39 @@ class Result:
         ## Opening hours.
         if self.opening_hours is not None:
             if self.opening_hours.is_open():
-                tags.append(("open", "Ouvert", 'AAA'))
+                tags.append(("open", _("Ouvert"), 'AAA'))
             else:
-                tags.append(("closed", "Fermé", 'AAB'))
+                tags.append(("closed", _("Fermé"), 'AAB'))
         else:
-            tags.append(("unknown_schedules", "Horaires inconnues", 'AAC'))
+            tags.append(("unknown_schedules", _("Horaires inconnues"), 'AAC'))
         
         ## Wheelchairs.
         wc = self.properties.get("wheelchair")
         if wc:
             if wc == "yes":
-                tags.append(("wheelchair_yes", "Accessible aux fauteuils roulants", 'ZBA'))
+                tags.append((
+                    "wheelchair_yes",
+                    _("Accessible aux fauteuils roulants"),
+                    'ZBA'
+                ))
             elif wc == "limited":
-                tags.append(("wheelchair_limited", "Accès limité aux fauteuils roulants", 'ZBB'))
+                tags.append((
+                    "wheelchair_limited",
+                    _("Accès limité aux fauteuils roulants"),
+                    'ZBB'
+                ))
             elif wc == "no":
-                tags.append(("wheelchair_no", "Non accessible aux aux fauteuils roulants", 'ZBC'))
+                tags.append((
+                    "wheelchair_no",
+                    _("Non accessible aux aux fauteuils roulants"),
+                    'ZBC'
+                ))
         else:
-            tags.append(("wheelchair_unknown", "Accessibilité aux fauteuils roulants inconnue", 'ZBD'))
+            tags.append((
+                "wheelchair_unknown",
+                _("Accessibilité aux fauteuils roulants inconnue"),
+                'ZBD'
+            ))
         return tags
     
     def render(self, render_tags=True, link_to_osm=True, opening_hours=True, oh_in_popover=True, itinerary=True):

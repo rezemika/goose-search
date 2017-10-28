@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-27 16:01+0200\n"
+"POT-Creation-Date: 2017-10-29 15:31+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: rezemika\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -122,20 +122,15 @@ msgid ""
 msgstr "Error line {}. Each line must of the form '\"key\"=\"value\"'."
 
 #: search/models.py:70
-#, fuzzy
-#| msgid ""
-#| "Erreur ligne {}. Chaque ligne doit être de la forme '\"key\"=\"value\"'."
 msgid ""
 "Erreur ligne {}. Chaque ligne doit être de la forme 'key=value == tag == "
 "Description'."
-msgstr "Error line {}. Each line must of the form 'key=value == tag == "
-"Description'."
+msgstr ""
+"Error line {}. Each line must of the form 'key=value == tag == Description'."
 
 #: search/models.py:80
-#, fuzzy
-#| msgid "Nom : "
 msgid "Nom"
-msgstr "Name: "
+msgstr "Name"
 
 #: search/models.py:83 search/models.py:122
 msgid "Règles de traitement"
@@ -229,10 +224,8 @@ msgstr ""
 "tool or script from Google, Facebook or Twitter."
 
 #: search/templates/search/filter_panel.part.html:7
-#, fuzzy
-#| msgid "Pas de résultats."
 msgid "Filtrer les résultats"
-msgstr "No results."
+msgstr "Filter results"
 
 #: search/templates/search/home.html:7
 msgid ""
@@ -325,12 +318,14 @@ msgid "Pas de résultats."
 msgstr "No results."
 
 #: search/templates/search/marker_popup.part.html:15
-#: search/templates/search/result_block.part.html:24 search/utils.py:490
+#: search/templates/search/result_block.part.html:24 search/utils.py:458
+#: search/utils.py:506
 msgid "Ouvert"
 msgstr "Open"
 
 #: search/templates/search/marker_popup.part.html:17
-#: search/templates/search/result_block.part.html:26 search/utils.py:492
+#: search/templates/search/result_block.part.html:26 search/utils.py:460
+#: search/utils.py:508
 msgid "Fermé"
 msgstr "Closed"
 
@@ -347,7 +342,7 @@ msgid "Direction : %(bearing)s° %(direction)s"
 msgstr "Direction: %(bearing)s° %(direction)s"
 
 #: search/templates/search/marker_popup.part.html:28
-#: search/templates/search/result_block.part.html:38 search/utils.py:500
+#: search/templates/search/result_block.part.html:38 search/utils.py:516
 msgid "Téléphone : "
 msgstr "Phone: "
 
@@ -388,6 +383,18 @@ msgstr ""
 msgid "Recherche…"
 msgstr "Searching…"
 
+#: search/templatetags/geo_extras.py:25 search/utils.py:533
+msgid "Horaires d'ouverture"
+msgstr "Opening hours"
+
+#: search/templatetags/geo_extras.py:51 search/utils.py:568
+msgid "Itinéraire jusqu'à ce point"
+msgstr "Itinerary to this point"
+
+#: search/templatetags/geo_extras.py:63
+msgid "Lien OSM"
+msgstr "OSM link"
+
 #: search/utils.py:257
 #, python-brace-format
 msgid "Adresse estimée : {housenumber} {street}, {postcode} {city}"
@@ -416,27 +423,39 @@ msgstr "Exact address : {housenumber} {street}, {city} {postcode}"
 msgid "Adresse exacte : {housenumber}, {street}"
 msgstr "Exact address : {housenumber} {street}"
 
-#: search/utils.py:487
+#: search/utils.py:462
+msgid "Horaires inconnues"
+msgstr "Unknown schedules"
+
+#: search/utils.py:470
+msgid "Accessible aux fauteuils roulants"
+msgstr "Accessible to wheelchairs"
+
+#: search/utils.py:476
+msgid "Accès limité aux fauteuils roulants"
+msgstr "Limited access to wheelchairs"
+
+#: search/utils.py:482
+msgid "Non accessible aux aux fauteuils roulants"
+msgstr "Inaccessible to wheelchairs"
+
+#: search/utils.py:488
+msgid "Accessibilité aux fauteuils roulants inconnue"
+msgstr "Wheelchair access unknown"
+
+#: search/utils.py:503
 msgid "Nom : {}"
 msgstr "Name: {}"
 
-#: search/utils.py:493
+#: search/utils.py:509
 #, python-brace-format
 msgid "Distance : {distance} mètres"
 msgstr "Distance: {distance} meters"
 
-#: search/utils.py:494
+#: search/utils.py:510
 #, python-brace-format
 msgid "Direction : {degrees}° {direction}"
 msgstr "Direction: {degrees}° {direction}"
-
-#: search/utils.py:517
-msgid "Horaires d'ouverture"
-msgstr "Opening hours"
-
-#: search/utils.py:552
-msgid "Itinéraire jusqu'à ce point"
-msgstr "Itinerary to this point"
 
 #: search/views.py:73 search/views.py:338
 msgid "L'ID de l'objet de votre recherche est invalide."
