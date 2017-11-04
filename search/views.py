@@ -279,7 +279,8 @@ def get_results(request):
     return HttpResponse(json.dumps({
             "status": status, "content": rendered_results,
             "filters": filter_panel, "map_data": map_data,
-            "err_msg": err_msg, "debug_msg": debug_msg
+            "err_msg": err_msg, "debug_msg": debug_msg,
+            "fail_msg": fail_msg
         }),
         content_type="application/json"
     )
