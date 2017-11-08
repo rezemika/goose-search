@@ -11,12 +11,12 @@
     <br/>
     {% if result.opening_hours %}
         <p>
-        {% if result.opening_hours.is_open %}
-            <b>{% trans "Ouvert" %}</b>
-        {% else %}
-            <b>{% trans "Fermé" %}</b>
-        {% endif %}
-        <br/></p>
+            {% if result.opening_hours.is_open %}
+                <b>{% trans "Ouvert" %}</b>
+            {% else %}
+                <b>{% trans "Fermé" %}</b>
+            {% endif %}<br/>
+        </p>
     {% endif %}
     <p>{{ result.get_address }}</p>
     <p>
@@ -29,9 +29,9 @@
     {% endif %}
     {% with properties=result|render_properties %}
         {% if properties %}
-        <p>
-            {{ properties|linebreaksbr }}
-        </p>
+            <p>
+                {{ properties|linebreaksbr }}
+            </p>
         {% endif %}
     {% endwith %}
 </div>

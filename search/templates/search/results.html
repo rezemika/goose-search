@@ -19,8 +19,8 @@
         <br/>
         <p>{% blocktrans %}Les résultats sont triés par ordre croissant de distance par rapport à votre position. Les liens de guidage sont prévus pour des piétons.{% endblocktrans %}</p>
         {% if not error_msg %}
-        <br/>
-        <p>{% blocktrans %}Permalien vers cette recherche : {% endblocktrans %}<a href="{{ permalink }}">{{ permalink }}</a></p>
+            <br/>
+            <p>{% blocktrans %}Permalien vers cette recherche : {% endblocktrans %}<a href="{{ permalink }}">{{ permalink }}</a></p>
         {% endif %}
     </div>
     <form action="{% url 'home' %}"><input type="submit" value="{% trans 'Nouvelle recherche' %}" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
@@ -83,45 +83,45 @@
     </form>
     <hr>
     {% if not error_msg %}
-    <!-- Search Glyphicon from http://glyphicons.com/ -->
-    <div id="geo_results" aria-busy="true">
-        <div class="sk-circle" id="loading-animation">
-            <div class="sk-circle1 sk-child"></div>
-            <div class="sk-circle2 sk-child"></div>
-            <div class="sk-circle3 sk-child"></div>
-            <div class="sk-circle4 sk-child"></div>
-            <div class="sk-circle5 sk-child"></div>
-            <div class="sk-circle6 sk-child"></div>
-            <div class="sk-circle7 sk-child"></div>
-            <div class="sk-circle8 sk-child"></div>
-            <div class="sk-circle9 sk-child"></div>
-            <div class="sk-circle10 sk-child"></div>
-            <div class="sk-circle11 sk-child"></div>
-            <div class="sk-circle12 sk-child"></div>
+        <!-- Search Glyphicon from http://glyphicons.com/ -->
+        <div id="geo_results" aria-busy="true">
+            <div class="sk-circle" id="loading-animation">
+                <div class="sk-circle1 sk-child"></div>
+                <div class="sk-circle2 sk-child"></div>
+                <div class="sk-circle3 sk-child"></div>
+                <div class="sk-circle4 sk-child"></div>
+                <div class="sk-circle5 sk-child"></div>
+                <div class="sk-circle6 sk-child"></div>
+                <div class="sk-circle7 sk-child"></div>
+                <div class="sk-circle8 sk-child"></div>
+                <div class="sk-circle9 sk-child"></div>
+                <div class="sk-circle10 sk-child"></div>
+                <div class="sk-circle11 sk-child"></div>
+                <div class="sk-circle12 sk-child"></div>
+            </div>
+            <h3 class="center">{% blocktrans %}Recherche…{% endblocktrans %}</h3>
+            <br>
         </div>
-        <h3 class="center">{% blocktrans %}Recherche…{% endblocktrans %}</h3>
-        <br>
-    </div>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/loading-animation.css' %}" />
-    <script type="text/javascript" src="{% static 'js/search_filters.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/search_ajax.js' %}"></script>
-    
-    <script type="text/javascript">
-        var userLatitude = {{ user_coords.0|render_coordinate }};
-        var userLongitude = {{ user_coords.1|render_coordinate }};
-        var radius = {{ radius }};
-        var searchPresetId = {{ search_preset_id }};
-        var noPrivate = {{ no_private|render_bool_js }};
-        $(document).ready(function() {
-            request_results(radius, userLatitude, userLongitude, searchPresetId, noPrivate);
-        });
+        <link rel="stylesheet" type="text/css" href="{% static 'css/loading-animation.css' %}" />
+        <script type="text/javascript" src="{% static 'js/search_filters.js' %}"></script>
+        <script type="text/javascript" src="{% static 'js/search_ajax.js' %}"></script>
         
-        // Disables the button to get the map, awaiting the results.
-        $('#map_getter').prop('disabled', true);
-    </script>
+        <script type="text/javascript">
+            var userLatitude = {{ user_coords.0|render_coordinate }};
+            var userLongitude = {{ user_coords.1|render_coordinate }};
+            var radius = {{ radius }};
+            var searchPresetId = {{ search_preset_id }};
+            var noPrivate = {{ no_private|render_bool_js }};
+            $(document).ready(function() {
+                request_results(radius, userLatitude, userLongitude, searchPresetId, noPrivate);
+            });
+            
+            // Disables the button to get the map, awaiting the results.
+            $('#map_getter').prop('disabled', true);
+        </script>
     {% else %}
-    <div id="geo_results">
-        <em class="center">{{ error_msg }}</em>
-    </div>
+        <div id="geo_results">
+            <em class="center">{{ error_msg }}</em>
+        </div>
     {% endif %}
 {% endblock %}

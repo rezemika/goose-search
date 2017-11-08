@@ -20,20 +20,20 @@
         </div>
     </form>
     {% if "light" in base_template %}
-    <style>
-        .light-box {
-            margin-bottom: 0.5em;
-            border: solid 1px;
-            border-color: grey;
-            border-radius: 1em;
-            //width: 90%;
-            padding: 0.5em;
-        }
-        em {
-            font-weight: bold;
-            font-size: 110%;
-        }
-    </style>
+        <style>
+            .light-box {
+                margin-bottom: 0.5em;
+                border: solid 1px;
+                border-color: grey;
+                border-radius: 1em;
+                //width: 90%;
+                padding: 0.5em;
+            }
+            em {
+                font-weight: bold;
+                font-size: 110%;
+            }
+        </style>
     {% endif %}
     <script type="text/javascript" src="{% static 'js/geolocation_form.js' %}"></script>
     {% if "light" in base_template %}
@@ -44,14 +44,14 @@
             {% get_language_info_list for LANGUAGES as languages %}
             <ul>
                 {% for language in languages %}
-                <li>
-                    <form action="{% url 'set_language' %}" method="post" id="form_{{ language.code }}" onclick="this.submit();" style="cursor:pointer;">
-                        {% csrf_token %}
-                        <input name="next" type="hidden" value="{{ request.path }}"/>
-                        <input name="language" type="hidden" value="{{ language.code }}"/>
-                        <button type="submit" form="form_{{ language.code }}">{{ language.name_local|title }} ({{ language.code }})</button>
-                    </form>
-                </li><br/>
+                    <li>
+                        <form action="{% url 'set_language' %}" method="post" id="form_{{ language.code }}" onclick="this.submit();" style="cursor:pointer;">
+                            {% csrf_token %}
+                            <input name="next" type="hidden" value="{{ request.path }}"/>
+                            <input name="language" type="hidden" value="{{ language.code }}"/>
+                            <button type="submit" form="form_{{ language.code }}">{{ language.name_local|title }} ({{ language.code }})</button>
+                        </form>
+                    </li><br/>
                 {% endfor %}
             </ul>
         </div>

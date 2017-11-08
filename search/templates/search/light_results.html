@@ -17,13 +17,14 @@
         <p>{% trans "Recherche : " %}{{ search_description }}{% if use_get_params %} {% blocktrans %}Cette recherche utilise un permalien.{% endblocktrans %}{% endif %}</p>
         <p>{% blocktrans %}Les résultats sont triés par ordre croissant de distance par rapport à votre position. Les liens de guidage sont prévus pour des piétons.{% endblocktrans %}</p>
         {% if not error_msg %}
-        <p>{% blocktrans %}Permalien vers cette recherche : {% endblocktrans %}<a href="{{ permalink }}">{{ permalink }}</a></p>
+            <p>{% blocktrans %}Permalien vers cette recherche : {% endblocktrans %}<a href="{{ permalink }}">{{ permalink }}</a></p>
         {% endif %}
     </div>
     <br/>
     <div class="center"><form action="{% url 'home' %}"><input type="submit" value="{% trans 'Nouvelle recherche' %}" class="btn btn-primary btn-mobile btn-sharp btn-block"></form></div>
     {% if results %}<br/>
-    <em class="center">{% blocktrans with count=results|length plural=results|pluralize %}{{ count }} résultat{{ plural }}{% endblocktrans %}</em>{% endif %}
+        <em class="center">{% blocktrans with count=results|length plural=results|pluralize %}{{ count }} résultat{{ plural }}{% endblocktrans %}</em>
+    {% endif %}
     <hr>
     <div id="results_list">
         {% if error_msg %}

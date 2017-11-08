@@ -20,12 +20,12 @@
     {% endif %}
     {% if result.opening_hours %}
         <p>
-        {% if result.opening_hours.is_open %}
-            <b>{% trans "Ouvert" %}</b>
-        {% else %}
-            <b>{% trans "Fermé" %}</b>
-        {% endif %}
-        <br/></p>
+            {% if result.opening_hours.is_open %}
+                <b>{% trans "Ouvert" %}</b>
+            {% else %}
+                <b>{% trans "Fermé" %}</b>
+            {% endif %}<br/>
+        </p>
     {% endif %}
     <p>
         {% blocktrans with distance=result.distance %}Distance : {{ distance }} mètres{% endblocktrans %}<br/>
@@ -48,11 +48,11 @@
         <p>{{ result|render_opening_hours:oh_in_popover|safe }}</p>
     {% endif %}
     {% with properties=result|render_properties %}
-    {% if properties %}
-    <p>
-        {{ properties|linebreaksbr }}
-    </p>
-    {% endif %}
+        {% if properties %}
+            <p>
+                {{ properties|linebreaksbr }}
+            </p>
+        {% endif %}
     {% endwith %}
     <p>
         {{ result|render_address_link|safe }}
