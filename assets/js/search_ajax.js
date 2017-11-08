@@ -22,7 +22,7 @@ function request_results (radius, userLatitude, userLongitude, searchPresetId, n
             if (json.status != "ok") {
                 console.log('Error : Request status != "ok"');
                 console.log(json.debug_msg);
-                $('#geo_results').html("<center><em>" + json.err_msg + "</em></center>");
+                $('#geo_results').html('<em class="center">' + json.err_msg + "</em>");
                 $('#geo_results').attr("aria-live", "assertive");
                 $('#geo_results').attr("aria-busy", "false");
                 return
@@ -66,7 +66,7 @@ function request_results (radius, userLatitude, userLongitude, searchPresetId, n
         error: function (xhr, errmsg, err) {
             // This should not happen, because a 500 error should be
             // caught by 'handle_500_get_results'.
-            $('#geo_results').html("<center><em>Error 500</em></center>")
+            $('#geo_results').html('<em class="center">Error 500</em>')
             // Provides a bit more info about the error to the console.
             console.log(JSON.stringify(xhr, null, 2));
             $('#map_getter').prop("disabled", false);

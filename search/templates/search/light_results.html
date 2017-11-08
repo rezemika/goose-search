@@ -21,18 +21,18 @@
         {% endif %}
     </div>
     <br/>
-    <center><form action="{% url 'home' %}"><input type="submit" value="{% trans 'Nouvelle recherche' %}" class="btn btn-primary btn-mobile btn-sharp btn-block"></form>
+    <div class="center"><form action="{% url 'home' %}"><input type="submit" value="{% trans 'Nouvelle recherche' %}" class="btn btn-primary btn-mobile btn-sharp btn-block"></form></div>
     {% if results %}<br/>
-    <em>{% blocktrans with count=results|length plural=results|pluralize %}{{ count }} résultat{{ plural }}{% endblocktrans %}</em></center>{% endif %}
+    <em class="center">{% blocktrans with count=results|length plural=results|pluralize %}{{ count }} résultat{{ plural }}{% endblocktrans %}</em>{% endif %}
     <hr>
     <div id="results_list">
         {% if error_msg %}
-            <center><em>{{ error_msg }}</em></center>
+            <em class="center">{{ error_msg }}</em>
         {% else %}
             {% for result in results %}
                 {% include "search/result_block.part.html" with result=result render_tags=0 oh_in_popover=0 light=1 %}
             {% empty %}
-                <center><em>{% blocktrans %}Pas de résultats.{% endblocktrans %}</em></center>
+                <em class="center">{% blocktrans %}Pas de résultats.{% endblocktrans %}</em>
             {% endfor %}
         {% endif %}
     </div>
@@ -84,6 +84,11 @@
         }
         .osm-link-logo {
             float: right;
+        }
+        .center {
+            text-align: center;
+            display: block;
+            margin: auto;
         }
     </style>
 {% endblock %}
