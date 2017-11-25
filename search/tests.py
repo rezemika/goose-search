@@ -644,7 +644,8 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/light/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, '<em class="center">')
+        self.assertNotContains(response, '<em class="center">Erreur 500')
+        self.assertNotContains(response, 'erreur')
         self.assertContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 64.14624")
         self.assertContains(response, "Longitude : -21.94259")
@@ -665,7 +666,8 @@ class PermalinkTest(TestCase):
         }
         response = self.client.get('/light/', get_data)
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, '<em class="center">')
+        self.assertNotContains(response, '<em class="center">Erreur 500')
+        self.assertNotContains(response, 'erreur')
         self.assertContains(response, self.escape_request_uri(response))
         self.assertContains(response, "Latitude : 64.14624")
         self.assertContains(response, "Longitude : -21.94259")

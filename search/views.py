@@ -173,10 +173,10 @@ def handle_500_get_results(view):
                 {
                     "status": "error", "error": str(e),
                     "err_msg": (
-                        '<center><em>' + _("Erreur 500") +
-                        '.</em></center><br/><center><em>' +
+                        '<em class="center">' + _("Erreur 500") +
+                        '.</em><br/><em class="center">' +
                         _("Désolé, une erreur non prise en charge "
-                        "s'est produite.") + '</em></center>'
+                        "s'est produite.") + '</em>'
                     )
                 }
             )
@@ -233,7 +233,7 @@ def get_results(request):
         status = "ok"
         debug_logger.debug("Request successfull!")
         if not results:
-            fail_msg = '<center><em>' + _("Pas de résultats.") + '</em></center>'
+            fail_msg = '<em class="center">' + _("Pas de résultats.") + '</em>'
     except geopy.exc.GeopyError as e:
         err_msg = _(
             "Une erreur s'est produite lors de l'acquisition "
