@@ -136,7 +136,8 @@ class SearchPreset(models.Model):
             Return a string describing the object with its properties and PR.
         """
         output = []
-        for line in self.processing_rules.splitlines():
+        pr = self.processing_rules if self.processing_rules is not None else ''
+        for line in pr.splitlines():
             if re.match('DISPLAY ".*":"\w+"', line):
                 label, key = re.findall('DISPLAY "(.*)":"(\w+)"', line)[0]
                 value = properties.get(key)
