@@ -288,9 +288,9 @@ class ViewsTest(TestCase):
             self.fail("Test result can not be found.")
         self.assertIn("Distance : 11990937 mètres", test_result)
         self.assertIn("Direction : 107,6° E →", test_result)
-        self.assertIn('Téléphone : <a href="tel:+354 411 1111">+354 411 1111</a><br/>', test_result)
-        self.assertIn("<hr/>\n        <p>A great city hall!</p>\n        <hr/>", test_result)
-        self.assertIn('Site web : <a href="example.com">example.com</a>', test_result)
+        self.assertIn('Téléphone : <a href="tel:+354 411 1111" itemprop="telephone">+354 411 1111</a><br/>', test_result)
+        self.assertIn('<hr/>\n        <p>A great city hall!</p>\n        <hr/>', test_result)
+        self.assertIn('Site web : <a href="example.com" itemprop="url">example.com</a>', test_result)
         self.assertIn("Adresse estimée : ", test_result)
         return
 
@@ -338,7 +338,7 @@ class LightViewsTest(TestCase):
         self.assertContains(response, "Direction : 107,6° E →")
         self.assertContains(
             response, (
-                'Téléphone : <a href="tel:+354 411 1111">'
+                'Téléphone : <a href="tel:+354 411 1111" itemprop="telephone">'
                 '+354 411 1111</a>'
             )
         )

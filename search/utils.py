@@ -254,7 +254,7 @@ def parse_csv_data(result, csv_line, address_data):
                 result.osm_meta[1]
             )
         )
-        address = _("Adresse estimée : {housenumber} {street}, {postcode} {city}").format(
+        address = _('Adresse estimée : <span itemprop="streetAddress">{housenumber} {street}</span>, <span itemprop="postalCode">{postcode}</span> <span itemprop="addressLocality">{city}</span>').format(
             housenumber=address_data[0],
             street=address_data[1],
             postcode=address_data[2],
@@ -267,7 +267,7 @@ def parse_csv_data(result, csv_line, address_data):
                 result.osm_meta[1]
             )
         )
-        address = _("Adresse estimée : {housenumber} {street}").format(
+        address = _('Adresse estimée : <span itemprop="streetAddress">{housenumber}, {street}</span>').format(
             housenumber=address_data[0],
             street=address_data[1]
         )
@@ -424,14 +424,14 @@ class Result:
             "postcode": self.properties.get("addr:postcode")
         }
         if all(address_data.values()):
-            return _("Adresse exacte : {housenumber} {street}, {postcode} {city}").format(
+            return _('Adresse exacte : <span itemprop="streetAddress">{housenumber} {street}</span>, <span itemprop="postalCode">{postcode}</span> <span itemprop="addressLocality">{city}</span>').format(
                 housenumber=escape(address_data["housenumber"]),
                 street=escape(address_data["street"]),
                 postcode=escape(address_data["postcode"]),
                 city=escape(address_data["city"])
             )
         elif address_data["housenumber"] and address_data["street"]:
-            return _("Adresse exacte : {housenumber}, {street}").format(
+            return _('Adresse exacte : <span itemprop="streetAddress">{housenumber}, {street}</span>').format(
                 housenumber=escape(address_data["housenumber"]),
                 street=escape(address_data["street"])
             )

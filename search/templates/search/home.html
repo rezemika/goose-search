@@ -10,7 +10,7 @@
         <div class="alert alert-danger" role="alert">La recherche classique de Goose nécessite Javascript pour fonctionner correctement. Activez-le dans votre navigateur, ou utilisez <a href="{% url 'light' %}">Goose Light</a> pour faire une recherche sans Javascript.</div>
         <br/>
     </noscript>
-    <form method="post" action="" id="geoform">
+    <form method="post" action="" id="geoform" itemscope itemtype="http://schema.org/SearchAction">
         <div role="search">
             {{ limit_error|safe }} {# TODO : Check usefulness. #}
             {% csrf_token %}
@@ -45,11 +45,11 @@
             <ul>
                 {% for language in languages %}
                     <li>
-                        <form action="{% url 'set_language' %}" method="post" id="form_{{ language.code }}" onclick="this.submit();" style="cursor:pointer;">
+                        <form action="{% url 'set_language' %}" method="post" id="form_{{ language.code }}" onclick="this.submit();" style="cursor:pointer;" itemscope itemtype="http://schema.org/Language">
                             {% csrf_token %}
                             <input name="next" type="hidden" value="{{ request.path }}"/>
                             <input name="language" type="hidden" value="{{ language.code }}"/>
-                            <button type="submit" form="form_{{ language.code }}">{{ language.name_local|title }} ({{ language.code }})</button>
+                            <button type="submit" form="form_{{ language.code }}" itemprop="name">{{ language.name_local|title }} ({{ language.code }})</button>
                         </form>
                     </li><br/>
                 {% endfor %}

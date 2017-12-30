@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-29 15:31+0100\n"
+"POT-Creation-Date: 2017-12-30 21:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: rezemika\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -313,7 +313,7 @@ msgstr "New search"
 msgid "%(count)s résultat%(plural)s"
 msgstr "%(count)s result%(plural)s"
 
-#: search/templates/search/light_results.html:35 search/views.py:236
+#: search/templates/search/light_results.html:36 search/views.py:236
 msgid "Pas de résultats."
 msgstr "No results."
 
@@ -395,33 +395,29 @@ msgstr "Itinerary to this point"
 msgid "Lien OSM"
 msgstr "OSM link"
 
-#: search/utils.py:257
+#: search/utils.py:257 search/utils.py:427
 #, python-brace-format
-msgid "Adresse estimée : {housenumber} {street}, {postcode} {city}"
-msgstr "Estimated address : {housenumber} {street}, {city} {postcode}"
+msgid ""
+"Adresse exacte : <span itemprop=\"streetAddress\">{housenumber} {street}</span>, "
+"<span itemprop=\"postalCode\">{postcode}</span> "
+"<span itemprop=\"addressLocality\">{city}</span>"
+msgstr ""
+"Exact address: <span itemprop=\"streetAddress\">{housenumber} {street}</"
+"span>, <span itemprop=\"addressLocality\">{city}</span> "
+"<span itemprop=\"postalCode\">{postcode}</span>"
 
-#: search/utils.py:270
-#, python-brace-format
-msgid "Adresse estimée : {housenumber} {street}"
-msgstr "Estimated address : {housenumber} {street}"
+#: search/utils.py:270 search/utils.py:434
+msgid ""
+"Adresse exacte : <span itemprop=\"streetAddress\">{housenumber}, {street}</span>"
+msgstr "Exact address : <span itemprop=\"streetAddress\">{housenumber} {street}</span>"
 
 #: search/utils.py:287
 msgid "Adresse estimée : {}"
-msgstr "Estimated address : {}"
+msgstr "Estimated address: {}"
 
 #: search/utils.py:417
 msgid "Adresse : Adresse inconnue"
 msgstr "Adress: Unknown"
-
-#: search/utils.py:427
-#, python-brace-format
-msgid "Adresse exacte : {housenumber} {street}, {postcode} {city}"
-msgstr "Exact address : {housenumber} {street}, {city} {postcode}"
-
-#: search/utils.py:434
-#, python-brace-format
-msgid "Adresse exacte : {housenumber}, {street}"
-msgstr "Exact address : {housenumber} {street}"
 
 #: search/utils.py:462
 msgid "Horaires inconnues"
@@ -457,27 +453,27 @@ msgstr "Distance: {distance} meters"
 msgid "Direction : {degrees}° {direction}"
 msgstr "Direction: {degrees}° {direction}"
 
-#: search/views.py:73 search/views.py:338
+#: search/views.py:73 search/views.py:339
 msgid "L'ID de l'objet de votre recherche est invalide."
 msgstr "The object ID of your search is invalid."
 
-#: search/views.py:81 search/views.py:346
+#: search/views.py:81 search/views.py:347
 msgid "Vos coordonnées sont invalides."
 msgstr "Your coordinates are invalid."
 
-#: search/views.py:95 search/views.py:360
+#: search/views.py:95 search/views.py:361
 msgid "Adresse inconnue"
 msgstr "Unknown adress"
 
-#: search/views.py:100 search/views.py:364
+#: search/views.py:100 search/views.py:365
 msgid "Vos coordonnées n'ont pas permis de trouver votre adresse actuelle."
 msgstr "Your coordinates have not helped to find your current address."
 
-#: search/views.py:112 search/views.py:376
+#: search/views.py:112 search/views.py:377
 msgid "Le rayon de recherche demandé est invalide."
 msgstr "The requested search radius is invalid."
 
-#: search/views.py:128 search/views.py:393
+#: search/views.py:128 search/views.py:394
 #, python-brace-format
 msgid ""
 "\"{search_preset}\" dans un rayon de {radius} mètres. Exclusion des "
@@ -486,7 +482,7 @@ msgstr ""
 "\"{search_preset}\" within a radius of {radius} meters. Exclusion of private "
 "access results."
 
-#: search/views.py:133 search/views.py:398
+#: search/views.py:133 search/views.py:399
 #, python-brace-format
 msgid ""
 "\"{search_preset}\" dans un rayon de {radius} mètres. Inclusion des "
@@ -495,11 +491,11 @@ msgstr ""
 "\"{search_preset}\" within a radius of {radius} meters. Inclusion of private "
 "access results."
 
-#: search/views.py:140 search/views.py:405
+#: search/views.py:140 search/views.py:406
 msgid "Paramètres invalides."
 msgstr "Invalid parameters."
 
-#: search/views.py:145 search/views.py:409
+#: search/views.py:145 search/views.py:410
 msgid ""
 "Trop de requêtes ont été faites en trop peu de temps. Merci d'attendre "
 "quelques secondes avant de raffraichir la page."
@@ -515,7 +511,7 @@ msgstr "Error 500"
 msgid "Désolé, une erreur non prise en charge s'est produite."
 msgstr "Sorry, an unsupported error has occurred."
 
-#: search/views.py:239 search/views.py:441
+#: search/views.py:239 search/views.py:442
 msgid ""
 "Une erreur s'est produite lors de l'acquisition de vos coordonnées. Vous "
 "pouvez essayer de recharger la page dans quelques instants."
@@ -523,7 +519,7 @@ msgstr ""
 "An error occurred while acquiring your position, you can try to reload the "
 "page in a few moments."
 
-#: search/views.py:247 search/views.py:449
+#: search/views.py:247 search/views.py:450
 msgid ""
 "Une erreur s'est produite lors de la requête vers les serveurs "
 "d'OpenStreetMap. Vous pouvez essayer de recharger la page dans quelques "
@@ -532,7 +528,7 @@ msgstr ""
 "An error occurred while querying to OpenStreetMap servers. You can try to "
 "reload the page in a few moments."
 
-#: search/views.py:254 search/views.py:456
+#: search/views.py:254 search/views.py:457
 msgid "Une erreur non prise en charge s'est produite."
 msgstr "Sorry, an unsupported error has occurred."
 
