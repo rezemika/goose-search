@@ -1,7 +1,7 @@
 astral==1.4
 certifi==2017.4.17
 chardet==3.0.4
-Django==1.10
+Django==1.11.28
 django-debug-toolbar==1.8
 django-modeltranslation==0.12.1
 django-ratelimit==1.0.1
