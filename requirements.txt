@@ -11,7 +11,7 @@ geopy==1.11.0
 gitdb2==2.0.2
 GitPython==2.1.5
 idna==2.5
-numpy==1.13.3
+numpy==1.22.0
 osm-humanized-opening-hours==0.1.1
 overpass==0.5.6
 pkg-resources==0.0.0
